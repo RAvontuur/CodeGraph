@@ -5,7 +5,7 @@ INSTALLATION:
 
 - build the jar using maven
 
-- create a property file containing:
+- create a property file containing:  
 sourceLocations=/home/rene/.m2/repository/org/springframework/spring-core/4.2.5.RELEASE/spring-core-4.2.5.RELEASE.jar  
 domainPackages=org.springframework  
 
