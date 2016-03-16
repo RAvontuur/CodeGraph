@@ -1,0 +1,130 @@
+<html>
+<head>
+	<title>Code Graph</title>
+	<meta charset="utf-8" />
+	<script src="/d3.v3.min.js" type="text/JavaScript"></script>
+	<script src="/queue.js" type="text/JavaScript"></script>
+</head>
+<style>
+	svg {
+		height: 600px;
+		width: 1000px;
+		border: 1px solid gray;
+	}
+
+    text {
+        font: 8px "Helvetica Neue", Helvetica, Arial, sans-serif;
+        text-anchor: middle;
+        pointer-events: none;
+    }
+</style>
+<body>
+<div id="msg">
+</div>
+<div>
+	<svg>
+	</svg>
+</div>
+</body>
+<footer>
+
+	<script>
+
+        redraw();
+
+        function redraw() {
+            queue()
+                    .defer(d3.json, "data")
+                    .defer(d3.json, "arrows")
+                    .await(
+                    function (error, file1, file2) {
+                        console.log(file1);
+                        dataViz(file1, file2)
+                    });
+        }
+
+		function dataViz(packages, arrows) {
+			var recHeight = 25;
+			var cellHeight = 40;
+            var yOffset = 5;
+            var yNameOffset = 10;
+
+			var xScale = d3.scale.linear().domain([0,1000]).range([ 0, 1000 ]);
+			var yScale = d3.scale.linear().domain([0,800]).range([ 0, 800 ]);
+
+			d3.select("svg").selectAll("rect").data(packages)
+					.enter()
+					.append("rect")
+					.attr("width", xScale(50))
+					.attr("height",yScale(recHeight))
+					.attr("x", function(d) {return xScale(5 + d.x * 60);})
+					.attr("y", function(d) {return yScale(yOffset + d.y * cellHeight);})
+					.style("fill", "blue")
+					.style("stroke", "red")
+					.style("stroke-width", "1px")
+					.style("opacity", .25)
+                    .on("click", rectClick);
+
+			d3.select("svg").selectAll("text").data(packages)
+					.enter()
+					.append("text")
+					.attr("x", function(d) {return xScale(30 + d.x * 60);})
+					.attr("y", function(d) {return yScale(yOffset + yNameOffset + d.y * cellHeight);})
+					.text( function(d) {return d.name;});
+
+// define marker
+			d3.select("svg").append("svg:defs").selectAll("marker")
+					.data(["arrow"])
+					.enter().append("svg:marker")
+					.attr("id", String)
+					.attr("viewBox", "0 -2 4 4")
+					.attr("refX", 4)
+					.attr("refY", 0)
+					.attr("markerWidth", 4)
+					.attr("markerHeight", 4)
+					.attr("orient", "auto")
+					.append("svg:path")
+					.attr("d", "M0,-2L4,0L0,0");
+
+			d3.select("svg").selectAll("line").data(arrows)
+					.enter()
+					.append("line")
+					.style("stroke", "red")
+					.style("stroke-width", "1px")
+					.attr("x2", function(d) {
+                        return xScale(45 + (d.x1 * 60)); // - 5 * (d.y2 - d.y1));
+                    })
+					.attr("y2", function(d) {
+						if (d.y2 > d.y1) {
+							return yScale(yOffset + recHeight + d.y1 * cellHeight);
+						} else {
+							return yScale(yOffset + d.y1 * cellHeight);
+						}
+					})
+					.attr("x1", function(d) {return xScale(35 + d.x2 * 60);})
+					.attr("y1", function(d) {
+						if (d.y2 > d.y1) {
+							return yScale(5 + d.y2 * cellHeight);
+						} else {
+							return yScale(yOffset + recHeight + d.y2 * cellHeight);
+						}
+					})
+					.attr("class", "link arrow")
+					.attr("marker-end", "url(#arrow)");
+
+		}
+
+        function rectClick(datapoint) {
+            console.log("rectClick: " + datapoint.name);
+            if (datapoint.name.indexOf(".") > -1) {
+                return;
+            }
+
+            window.location = datapoint.name + "/view";
+        }
+
+
+	</script>
+</footer>
+
+</html>
