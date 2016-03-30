@@ -63,9 +63,18 @@ public class AggregatedPackages {
 
         //start with the empty packages
         List<Package> emptyPackages = findEmptyPackages();
-        if (emptyPackages.isEmpty()) {
+        if (emptyPackages.isEmpty() || hasOnlyIndependent(emptyPackages)) {
             log.info("cyclic dependency, just take the first as root.");
-            emptyPackages.add(packages.get(packages.keySet().iterator().next()));
+            for (Map.Entry<String, Package> entry : packages.entrySet()) {
+                Package p = packages.get(entry.getKey());
+                if (p.getEfferents().size() == 0) {
+                    continue;
+                }
+                if (!emptyPackages.contains(p)) {
+                    emptyPackages.add(packages.get(entry.getKey()));
+                    break;
+                }
+            };
         }
 
         Stack<String> callers = new Stack<>();
@@ -78,6 +87,15 @@ public class AggregatedPackages {
             calcX(i);
         }
 
+    }
+
+    private boolean hasOnlyIndependent(List<Package> packages) {
+        for (Package p: packages) {
+            if (p.getAfferents().size() > 0 || p.getEfferents().size() > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public Map<String, Package> getPackages() {
@@ -147,9 +165,16 @@ public class AggregatedPackages {
                 continue;
             }
             String childName = getPackagePathChild(path, a.getName());
-            if (!currentPackage.getFullName().equals(childName)) {
-                currentPackage.addEfferent(childName);
+
+            if (childName == null) {
+                //out of scope current path
+                continue;
             }
+            if (currentPackage.getFullName().equals(childName)) {
+                //within same package
+                continue;
+            }
+            currentPackage.addEfferent(childName);
             log.info("Efferent: " + a.getName() + ", childName: " + childName);
         }
     }
@@ -164,9 +189,15 @@ public class AggregatedPackages {
                 continue;
             }
             String childName = getPackagePathChild(path, a.getName());
-            if (!currentPackage.getFullName().equals(childName)) {
-                currentPackage.addAfferent(childName);
+            if (childName == null) {
+                //out of scope current path
+                continue;
             }
+            if (currentPackage.getFullName().equals(childName)) {
+                //within same package
+                continue;
+            }
+            currentPackage.addAfferent(childName);
             log.info("Afferent: " + a.getName());
         }
     }

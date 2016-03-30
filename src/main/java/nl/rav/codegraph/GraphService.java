@@ -51,10 +51,7 @@ public class GraphService {
     }
 
     public void doView(String path) throws IOException {
-
-        if (cache.get("@" + path) != null) {
-            return;
-        }
+        //always update cache
         updateCache(path);
     }
 

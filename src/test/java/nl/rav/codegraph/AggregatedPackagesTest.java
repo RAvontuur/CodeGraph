@@ -104,7 +104,6 @@ public class AggregatedPackagesTest {
         assertThat(p.getPackages().get("com.test.data").toString(), is("0,1,data"));
         assertThat(p.getArrows().get(0).toString(), is("0,0,0,1"));
         assertThat(p.getArrows().get(1).toString(), is("0,1,0,0"));
-
     }
 
     @Test
@@ -124,17 +123,27 @@ public class AggregatedPackagesTest {
         assertThat(p.getPackages().get("com.test.web").toString(), is("0,0,web"));
     }
 
-//    @Test
-//    public void testTwoDifferentPackages() throws IOException {
-//        JavaPackage j0 = new JavaPackage("com.test.web");
-//        JavaPackage j1 = new JavaPackage("org.test.web");
-//
-//        Collection jPackages = Arrays.asList(j0, j1);
-//        AggregatedPackages p = new AggregatedPackages(jPackages);
-//        p.aggregate("com.test;org.test", new String[]{"com.test"});
-//
-//        assertThat(p.getPackages().size(), is(2));
-//        assertThat(p.getPackages().get("com.test.web").toString(), is("0,0,web"));
-//        assertThat(p.getPackages().get("org.test.web").toString(), is("1,0,web"));
-//    }
+    @Test
+    public void testThreePackagesTwoCyclicOneIndependent() throws IOException {
+        JavaPackage j0 = new JavaPackage("com.test.web");
+        JavaPackage j1 = new JavaPackage("com.test.data");
+        JavaPackage j2 = new JavaPackage("com.test.loner");
+
+        j0.addEfferent(j1);
+        j1.addEfferent(j0);
+        j1.addAfferent(j0);
+        j0.addAfferent(j1);
+
+        Collection jPackages = Arrays.asList(j0, j1, j2);
+        AggregatedPackages p = new AggregatedPackages(jPackages);
+        p.aggregate("com.test", new String[]{"com.test"});
+
+        assertThat(p.getPackages().size(), is(3));
+        assertThat(p.getArrows().size(), is(2));
+        assertThat(p.getPackages().get("com.test.loner").toString(), is("0,0,loner"));
+        assertThat(p.getPackages().get("com.test.web").toString(), is("1,0,web"));
+        assertThat(p.getPackages().get("com.test.data").toString(), is("0,1,data"));
+        assertThat(p.getArrows().get(0).toString(), is("1,0,0,1"));
+        assertThat(p.getArrows().get(1).toString(), is("0,1,1,0"));
+    }
 }
