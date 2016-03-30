@@ -13,51 +13,48 @@ import java.util.*;
 public class AggregatedPackages {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Collection jPackages;
 
     private Map<String, Package> packages = new HashMap<>();
-    private List<String> rootPackages = new ArrayList<>();
-
-    private final Collection jPackages;
 
     public AggregatedPackages(Collection jPackages) {
         this.jPackages = jPackages;
     }
 
-    public void aggregate(String rootPackageString) throws IOException {
-        setRootPackage(rootPackageString);
+    public void aggregate(String path, String[] acceptedPackages) throws IOException {
+        packages.clear();
 
         Iterator iter = jPackages.iterator();
         while (iter.hasNext()) {
             JavaPackage p = (JavaPackage) iter.next();
-            if (!accept(p)) {
+            if (!accept(acceptedPackages, p)) {
                 log.info("rejected: " + p.getName());
                 continue;
             }
 
-            String stem = getStemPackageName(p.getName());
-            Package currentPackage = packages.get(stem);
+            String childPath = getPackagePathChild(path, p.getName());
+            if (childPath == null) {
+                continue;
+            }
+
+            Package currentPackage = packages.get(childPath);
             if (currentPackage == null) {
                 currentPackage = new Package();
-                currentPackage.setFullName(stem);
-                currentPackage.setName(getStemSubPackageName(p.getName()));
+                currentPackage.setFullName(childPath);
+                currentPackage.setName(getPackageNameChild(path, p.getName()));
                 currentPackage.setX(0);
                 currentPackage.setY(0);
-                packages.put(stem, currentPackage);
+                packages.put(childPath, currentPackage);
             }
 
             log.info("package: " + p.getName() + ", stem: " + currentPackage.getName());
-            addEfferents(currentPackage, p);
-            addAfferents(currentPackage, p);
+            addEfferents(path, acceptedPackages, currentPackage, p);
+            addAfferents(path, acceptedPackages, currentPackage, p);
 
         }
         recalculate();
     }
 
-    private void setRootPackage(String rootPackageString) {
-        for (String p : rootPackageString.split(";")) {
-            rootPackages.add(p);
-        }
-    }
 
     private void recalculate() {
         if (packages.isEmpty()) {
@@ -105,38 +102,34 @@ public class AggregatedPackages {
         return result;
     }
 
-    private String getStemPackageName(String name) {
-        for (String rootPackage : rootPackages) {
-            if (name.equals(rootPackage)) {
-                return name;
-            }
-            if (name.startsWith(rootPackage + ".")) {
-                String remainder = name.substring(rootPackage.length() + 1);
-                int pos = remainder.indexOf(".");
-                String stem =  pos >= 0 ? remainder.substring(0, pos) : remainder;
-                return rootPackage + "." + stem;
-            }
+    private String getPackageNameChild(String path, String name) {
+        if (name.equals(path)) {
+            //current path
+            return ".";
         }
-        return name;
+        if (name.startsWith(path + ".")) {
+            String remainder = name.substring(path.length() + 1);
+            int pos = remainder.indexOf(".");
+            String childName = pos >= 0 ? remainder.substring(0, pos) : remainder;
+            return childName;
+        }
+        return null;
     }
 
-    private String getStemSubPackageName(String name) {
-        for (String rootPackage : rootPackages) {
-            if (name.equals(rootPackage)) {
-                return name;
-            }
-            if (name.startsWith(rootPackage + ".")) {
-                String remainder = name.substring(rootPackage.length() + 1);
-                int pos = remainder.indexOf(".");
-                String stem =  pos >= 0 ? remainder.substring(0, pos) : remainder;
-                return stem;
-            }
+    private String getPackagePathChild(String path, String name) {
+        String leafName = getPackageNameChild(path, name);
+        if (leafName == null) {
+            return null;
         }
-        return name;
+        if (leafName.equals(".")) {
+            //current path
+            return name;
+        }
+        return path + "." + leafName;
     }
 
-    private boolean accept(JavaPackage p) {
-        for (String rootPackage : rootPackages) {
+    private boolean accept(String[] acceptedPackages, JavaPackage p) {
+        for (String rootPackage : acceptedPackages) {
             if (p.getName().startsWith(rootPackage)) {
                 return true;
             }
@@ -145,34 +138,34 @@ public class AggregatedPackages {
     }
 
     //efferent = depends on
-    private void addEfferents(Package currentPackage, JavaPackage p) {
+    private void addEfferents(String path, String[] acceptedPackages, Package currentPackage, JavaPackage p) {
         Collection efferents = p.getEfferents();
         Iterator iter = efferents.iterator();
         while (iter.hasNext()) {
             JavaPackage a = (JavaPackage) iter.next();
-            if (!accept(a)) {
+            if (!accept(acceptedPackages, a)) {
                 continue;
             }
-            String stem = getStemPackageName(a.getName());
-            if (!currentPackage.getFullName().equals(stem)) {
-                currentPackage.addEfferent(stem);
+            String childName = getPackagePathChild(path, a.getName());
+            if (!currentPackage.getFullName().equals(childName)) {
+                currentPackage.addEfferent(childName);
             }
-            log.info("Efferent: " + a.getName() + ", stem: " + stem);
+            log.info("Efferent: " + a.getName() + ", childName: " + childName);
         }
     }
 
 
-    private void addAfferents(Package currentPackage, JavaPackage p) {
+    private void addAfferents(String path, String[] acceptedPackages, Package currentPackage, JavaPackage p) {
         Collection afferents = p.getAfferents();
         Iterator iter = afferents.iterator();
         while (iter.hasNext()) {
             JavaPackage a = (JavaPackage) iter.next();
-            if (!accept(a)) {
+            if (!accept(acceptedPackages, a)) {
                 continue;
             }
-            String stem = getStemPackageName(a.getName());
-            if (!currentPackage.getFullName().equals(stem)) {
-                currentPackage.addAfferent(stem);
+            String childName = getPackagePathChild(path, a.getName());
+            if (!currentPackage.getFullName().equals(childName)) {
+                currentPackage.addAfferent(childName);
             }
             log.info("Afferent: " + a.getName());
         }
@@ -198,7 +191,12 @@ public class AggregatedPackages {
     private List<Package> namesToPackages(Set<String> xferents) {
         List<Package> result = new ArrayList<>();
         for (String eff : xferents) {
-            result.add(packages.get(eff));
+            Package packageFound = packages.get(eff);
+            if (packageFound == null) {
+                log.warn("Efferent {} not found.", eff);
+                continue;
+            }
+            result.add(packageFound);
         }
         return result;
     }

@@ -66,15 +66,7 @@ public class GraphService {
 
         AggregatedPackages cacheItem = new AggregatedPackages(jPackages);
 
-        String rootPackageString = "";
-        for (String domainPackage: acceptedPackages) {
-            rootPackageString += domainPackage;
-            if (!path.isEmpty()) {
-                rootPackageString += "." + path;
-            }
-            rootPackageString += ";";
-        }
-        cacheItem.aggregate(rootPackageString);
+        cacheItem.aggregate(path, acceptedPackages);
         cache.put("@" + path, cacheItem);
     }
 
