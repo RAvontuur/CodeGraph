@@ -38,7 +38,8 @@ public class AggregatedPackages {
             Package currentPackage = packages.get(stem);
             if (currentPackage == null) {
                 currentPackage = new Package();
-                currentPackage.setName(stem);
+                currentPackage.setFullName(stem);
+                currentPackage.setName(getStemSubPackageName(p.getName()));
                 currentPackage.setX(0);
                 currentPackage.setY(0);
                 packages.put(stem, currentPackage);
@@ -112,7 +113,23 @@ public class AggregatedPackages {
             if (name.startsWith(rootPackage + ".")) {
                 String remainder = name.substring(rootPackage.length() + 1);
                 int pos = remainder.indexOf(".");
-                return pos >= 0 ? remainder.substring(0, pos) : remainder;
+                String stem =  pos >= 0 ? remainder.substring(0, pos) : remainder;
+                return rootPackage + "." + stem;
+            }
+        }
+        return name;
+    }
+
+    private String getStemSubPackageName(String name) {
+        for (String rootPackage : rootPackages) {
+            if (name.equals(rootPackage)) {
+                return name;
+            }
+            if (name.startsWith(rootPackage + ".")) {
+                String remainder = name.substring(rootPackage.length() + 1);
+                int pos = remainder.indexOf(".");
+                String stem =  pos >= 0 ? remainder.substring(0, pos) : remainder;
+                return stem;
             }
         }
         return name;
@@ -137,7 +154,7 @@ public class AggregatedPackages {
                 continue;
             }
             String stem = getStemPackageName(a.getName());
-            if (!currentPackage.getName().equals(stem)) {
+            if (!currentPackage.getFullName().equals(stem)) {
                 currentPackage.addEfferent(stem);
             }
             log.info("Efferent: " + a.getName() + ", stem: " + stem);
@@ -154,7 +171,7 @@ public class AggregatedPackages {
                 continue;
             }
             String stem = getStemPackageName(a.getName());
-            if (!currentPackage.getName().equals(stem)) {
+            if (!currentPackage.getFullName().equals(stem)) {
                 currentPackage.addAfferent(stem);
             }
             log.info("Afferent: " + a.getName());

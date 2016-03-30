@@ -11,6 +11,7 @@ public class Package {
     private int x;
     private int y;
     private String name;
+    private String fullName;
     private Set<String> efferents = new HashSet<>();
     private Set<String> afferents = new HashSet<>();
 
@@ -36,6 +37,14 @@ public class Package {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public static String toHeader() {

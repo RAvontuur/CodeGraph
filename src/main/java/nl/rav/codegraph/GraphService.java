@@ -22,7 +22,7 @@ public class GraphService {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final String[] sourceLocations;
-    private final String[] domainPackages;
+    private final String[] acceptedPackages;
 
     //naive cache
     private Map<String, AggregatedPackages> cache = new HashMap<>();
@@ -30,9 +30,9 @@ public class GraphService {
 
     @Autowired
     public GraphService(@Value("${sourceLocations}") String[] sourceLocations,
-                        @Value("${domainPackages}") String[] domainPackages) {
+                        @Value("${acceptedPackages}") String[] acceptedPackages) {
         this.sourceLocations = sourceLocations;
-        this.domainPackages = domainPackages;
+        this.acceptedPackages = acceptedPackages;
     }
 
     public Collection<Package> doData(String path) throws IOException {
@@ -44,6 +44,7 @@ public class GraphService {
     }
 
     public void doView(String path) throws IOException {
+
         if (cache.get("@" + path) != null) {
             return;
         }
@@ -66,8 +67,12 @@ public class GraphService {
         AggregatedPackages cacheItem = new AggregatedPackages(jPackages);
 
         String rootPackageString = "";
-        for (String domainPackage: domainPackages) {
-            rootPackageString = rootPackageString + domainPackage + path + ";";
+        for (String domainPackage: acceptedPackages) {
+            rootPackageString += domainPackage;
+            if (!path.isEmpty()) {
+                rootPackageString += "." + path;
+            }
+            rootPackageString += ";";
         }
         cacheItem.aggregate(rootPackageString);
         cache.put("@" + path, cacheItem);
