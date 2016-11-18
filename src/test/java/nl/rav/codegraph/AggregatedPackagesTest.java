@@ -1,6 +1,7 @@
 package nl.rav.codegraph;
 
 import jdepend.framework.JavaPackage;
+import nl.rav.codegraph.service.AggregatedPackages;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -140,10 +141,10 @@ public class AggregatedPackagesTest {
 
         assertThat(p.getPackages().size(), is(3));
         assertThat(p.getArrows().size(), is(2));
-        assertThat(p.getPackages().get("com.test.loner").toString(), is("0,0,loner"));
-        assertThat(p.getPackages().get("com.test.web").toString(), is("1,0,web"));
+        assertThat(p.getPackages().get("com.test.loner").toString(), is("1,0,loner"));
+        assertThat(p.getPackages().get("com.test.web").toString(), is("0,0,web"));
         assertThat(p.getPackages().get("com.test.data").toString(), is("0,1,data"));
-        assertThat(p.getArrows().get(0).toString(), is("1,0,0,1"));
-        assertThat(p.getArrows().get(1).toString(), is("0,1,1,0"));
+        assertThat(p.getArrows().get(0).toString(), is("0,0,0,1"));
+        assertThat(p.getArrows().get(1).toString(), is("0,1,0,0"));
     }
 }
