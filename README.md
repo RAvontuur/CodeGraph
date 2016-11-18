@@ -11,4 +11,4 @@ domainPackages=org.springframework
 
 - $ java -jar codegraph-1.0-SNAPSHOT.jar --spring.config.location=file:/dir/your.properties
 
-- open in browser: http://localhost:8080/view
+- open in browser: http://localhost:8080/nl/rav/codegraph/view
