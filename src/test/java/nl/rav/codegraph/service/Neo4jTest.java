@@ -11,6 +11,7 @@ import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Iterator;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
@@ -34,6 +35,24 @@ public class Neo4jTest {
         while (list.hasNext()) {
             PackageEntity result = list.next();
             System.out.println(result);
+        }
+    }
+
+    @Test
+    public void findAfferents() {
+        List<PackageEntity> afferents = packageRepository.findAfferents("nl.rav.codegraph.controller");
+
+        for(PackageEntity afferent: afferents) {
+            System.out.println(afferent);
+        }
+    }
+
+    @Test
+    public void findEfferents() {
+        List<PackageEntity> efferents = packageRepository.findEfferents("nl.rav.codegraph.service");
+
+        for(PackageEntity efferent: efferents) {
+            System.out.println(efferent);
         }
     }
 }

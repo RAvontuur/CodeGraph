@@ -159,6 +159,12 @@ public class AggregatedPackages {
 
     //efferent = depends on
     private void addEfferents(String path, String[] acceptedPackages, Package currentPackage, JavaPackage p) {
+
+        /*
+          MATCH (p:Package)-[:CONTAINS]->(:Class)-[:DEPENDS_ON]
+          ->(:Class)<-[:CONTAINS]-(q:Package) RETURN DISTINCT p,q
+         */
+
         Collection efferents = p.getEfferents();
         Iterator iter = efferents.iterator();
         while (iter.hasNext()) {
