@@ -1,5 +1,7 @@
-package nl.rav.codegraph;
+package nl.rav.codegraph.controller;
 
+import nl.rav.codegraph.service.GraphService;
+import nl.rav.codegraph.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +26,7 @@ public class GraphController {
     }
 
     @RequestMapping("**/data")
-    Collection<Package> dataroot(HttpServletRequest request) throws IOException {
+    Collection<nl.rav.codegraph.model.Package> dataroot(HttpServletRequest request) throws IOException {
         String url = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String packagePath = RequestParser.parseToPackage(url, "data");
         return graphService.doData(packagePath);

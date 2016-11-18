@@ -1,4 +1,4 @@
-package nl.rav.codegraph;
+package nl.rav.codegraph.model;
 
 import java.util.HashSet;
 import java.util.Set;

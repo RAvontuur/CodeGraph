@@ -1,6 +1,7 @@
-package nl.rav.codegraph;
+package nl.rav.codegraph.service;
 
 import jdepend.framework.JDepend;
+import nl.rav.codegraph.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class GraphService {
         this.mavenModules = mavenModules;
     }
 
-    public Collection<Package> doData(String path) throws IOException {
+    public Collection<nl.rav.codegraph.model.Package> doData(String path) throws IOException {
         return cache.get("@" + path).getPackages().values();
     }
 

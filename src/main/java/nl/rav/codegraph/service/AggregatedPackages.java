@@ -1,6 +1,8 @@
-package nl.rav.codegraph;
+package nl.rav.codegraph.service;
 
 import jdepend.framework.JavaPackage;
+import nl.rav.codegraph.model.*;
+import nl.rav.codegraph.model.Package;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +17,7 @@ public class AggregatedPackages {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final Collection jPackages;
 
-    private Map<String, Package> packages = new HashMap<>();
+    private Map<String, nl.rav.codegraph.model.Package> packages = new HashMap<>();
 
     public AggregatedPackages(Collection jPackages) {
         this.jPackages = jPackages;

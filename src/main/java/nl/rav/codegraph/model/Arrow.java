@@ -1,4 +1,4 @@
-package nl.rav.codegraph;
+package nl.rav.codegraph.model;
 
 /**
  * Created by rene on 10-3-16.

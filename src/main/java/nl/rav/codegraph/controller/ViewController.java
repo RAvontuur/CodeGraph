@@ -1,5 +1,6 @@
-package nl.rav.codegraph;
+package nl.rav.codegraph.controller;
 
+import nl.rav.codegraph.service.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
