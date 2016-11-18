@@ -1,7 +1,6 @@
-package nl.rav.codegraph;
+package nl.rav.codegraph.service;
 
 import jdepend.framework.JavaPackage;
-import nl.rav.codegraph.service.AggregatedPackages;
 import org.junit.Test;
 
 import java.io.IOException;
