@@ -3,6 +3,15 @@ Visualisation of jdepend dependency analysis results using d3.js visualisation l
 
 INSTALLATION:
 
+MAVEN
+- update application.properties (with your locations)
+- mvn install
+- mvn spring-boot:run
+- open in browser: http://localhost:8080/nl/rav/codegraph/view
+
+
+COMMAND LINE
+
 - build the jar using maven
 
 - create a property file containing:  
@@ -11,4 +20,4 @@ domainPackages=org.springframework
 
 - $ java -jar codegraph-1.0-SNAPSHOT.jar --spring.config.location=file:/dir/your.properties
 
-- open in browser: http://localhost:8080/nl/rav/codegraph/view
+- open in browser: http://localhost:8080/org/springframework/view
