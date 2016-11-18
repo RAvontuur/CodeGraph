@@ -39,6 +39,15 @@ public class Neo4jTest {
     }
 
     @Test
+    public void findChildren() {
+        List<PackageEntity> children = packageRepository.findChildren("nl.rav.codegraph.neo4j");
+
+        for(PackageEntity afferent: children) {
+            System.out.println(afferent);
+        }
+    }
+
+    @Test
     public void findAfferents() {
         List<PackageEntity> afferents = packageRepository.findAfferents("nl.rav.codegraph.controller");
 

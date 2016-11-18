@@ -11,6 +11,11 @@ import java.util.List;
  */
 public interface PackageRepository extends GraphRepository<PackageEntity> {
 
+    @Query("MATCH (p:Package)-[:CONTAINS]->(q:Package) " +
+            "WHERE p.fqn = {0} " +
+            "RETURN DISTINCT q")
+    List<PackageEntity> findChildren(String fqn);
+
     @Query("MATCH (p:Package)-[:CONTAINS]->(:Class)-[:DEPENDS_ON]" +
             "->(:Class)<-[:CONTAINS]-(q:Package) " +
             "WHERE p.fqn = {0} " +
