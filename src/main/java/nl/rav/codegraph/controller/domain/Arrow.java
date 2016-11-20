@@ -1,4 +1,4 @@
-package nl.rav.codegraph.model;
+package nl.rav.codegraph.controller.domain;
 
 /**
  * Created by rene on 10-3-16.

@@ -1,4 +1,4 @@
-package nl.rav.codegraph.service;
+package nl.rav.test.codegraph.service;
 
 import nl.rav.codegraph.neo4j.configuration.PersistenceContext;
 import nl.rav.codegraph.neo4j.domain.PackageEntity;
@@ -13,6 +13,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -34,6 +36,10 @@ public class Neo4jTest {
 
         while (list.hasNext()) {
             PackageEntity result = list.next();
+
+            PackageEntity result2 =  packageRepository.findByFqn(result.getFqn());
+
+            assertThat(result2.getFqn(), is(result.getFqn()));
             System.out.println(result);
         }
     }

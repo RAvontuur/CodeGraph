@@ -1,19 +1,16 @@
 package nl.rav.codegraph.service;
 
-import nl.rav.codegraph.model.*;
-import nl.rav.codegraph.model.Package;
-import nl.rav.codegraph.neo4j.domain.PackageEntity;
-import nl.rav.codegraph.neo4j.repository.PackageRepository;
+import nl.rav.codegraph.domain.Drawing;
+import nl.rav.codegraph.domain.JavaPackage;
+import nl.rav.codegraph.domain.PackageDependency;
+import nl.rav.codegraph.neo4j.service.PackageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by rene on 13-3-16.
@@ -23,60 +20,60 @@ public class GraphService {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private final PackageRepository packageRepository;
-    //naive cache
-    private Map<String, CacheItem> cache = new HashMap<>();
+    private final PackageService packageService;
 
     @Autowired
-    public GraphService(PackageRepository packageRepository) {
-        this.packageRepository = packageRepository;
+    public GraphService(PackageService packageService) {
+        this.packageService = packageService;
     }
 
-    public Collection<nl.rav.codegraph.model.Package> doData(String path) throws IOException {
-        return cache.get("@" + path).getPackages().values();
+    public Drawing createDrawingFor(String fqn) {
+
+        List<PackageDependency> dependencies = generateDependencies(fqn);
+
+        Drawing drawing = new Drawing();
+        drawing.generate(dependencies);
+        return drawing;
     }
 
-    public List<Arrow> doArrows(String path) {
-        return cache.get("@" + path).getArrows();
-    }
+    private List<PackageDependency> generateDependencies(String fqn) {
 
-    public void doView(String path) {
-        //always update cache
-        updateCache(path);
-    }
+        JavaPackage parentPackage = packageService.findPackage(fqn);
+        List<JavaPackage> childPackages = packageService.findChildren(fqn);
 
-    private void updateCache(String path) {
-        cache.put("@" + path, aggregate(path));
-    }
+        List<PackageDependency> dependencies = new ArrayList<>();
 
-    public CacheItem aggregate(String path) {
-        CacheItem cacheItem = new CacheItem();
+        for (JavaPackage brother : childPackages) {
+            PackageDependency dependency = new PackageDependency();
+            dependency.setFrom(brother);
+            dependencies.add(dependency);
 
-        List<PackageEntity> children = packageRepository.findChildren(path);
-        int x = 0;
-        int y = 0;
-        for (PackageEntity child: children) {
-            Package pckage = new Package();
-            pckage.setFullName(child.getFqn());
-            pckage.setName(child.getName());
-            pckage.setX(x);
-            pckage.setY(y);
-            cacheItem.getPackages().put(child.getName(), pckage);
-            y++;
-        }
-        for (Package brother: cacheItem.getPackages().values()) {
-            List<PackageEntity> sisterEntities = packageRepository.findAfferents(brother.getFullName());
-            for (PackageEntity sisterEntity: sisterEntities) {
-                Package sister = cacheItem.getPackages().get(sisterEntity.getName());
-                if (sister == null || brother.getFullName().equals(sister.getFullName())) {
-                    continue;
+            List<JavaPackage> afferents = packageService.findAfferents(brother.getFqn());
+            for (JavaPackage afferent : afferents) {
+                if (parentPackage.equalsOrContains(afferent) && !brother.equalsOrContains(afferent)) {
+                    // ignore dependencies
+                    // on other classes/interfaces outside parent-package
+                    // on other classes/interfaces in its own package or its sub-packages
+
+                    // assume for now: all dependencies are downwards
+                    JavaPackage sister = findChildPackage(afferent, childPackages);
+                    dependency.addDownwards(sister);
                 }
-                Arrow arrow = new Arrow(sister.getX(), sister.getY(), brother.getX(), brother.getY());
-                cacheItem.getArrows().add(arrow);
             }
         }
 
-        return cacheItem;
+        return dependencies;
     }
+
+    private JavaPackage findChildPackage(JavaPackage afferent, List<JavaPackage> childPackages) {
+        for (JavaPackage aPackage : childPackages) {
+            if (aPackage.equalsOrContains(afferent)) {
+                return aPackage;
+            }
+        }
+
+        return null;
+    }
+
 
 }

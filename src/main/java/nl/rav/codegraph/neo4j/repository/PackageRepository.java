@@ -11,21 +11,24 @@ import java.util.List;
  */
 public interface PackageRepository extends GraphRepository<PackageEntity> {
 
+    PackageEntity findByFqn(String fqn);
+
     @Query("MATCH (p:Package)-[:CONTAINS]->(q:Package) " +
             "WHERE p.fqn = {0} " +
             "RETURN DISTINCT q")
     List<PackageEntity> findChildren(String fqn);
 
-    @Query("MATCH (p:Package)-[:CONTAINS]->(:Class)-[:DEPENDS_ON]" +
-            "->(:Class)<-[:CONTAINS]-(q:Package) " +
+    @Query("MATCH (p:Package)-[:CONTAINS]->(x)-[:DEPENDS_ON]" +
+            "->(y)<-[:CONTAINS]-(q:Package) " +
             "WHERE p.fqn = {0} " +
             "RETURN DISTINCT q")
     List<PackageEntity> findAfferents(String fqn);
 
 
-    @Query("MATCH (p:Package)-[:CONTAINS]->(:Class)-[:DEPENDS_ON]" +
-            "->(:Class)<-[:CONTAINS]-(q:Package) " +
+    @Query("MATCH (p:Package)-[:CONTAINS]->(x)-[:DEPENDS_ON]" +
+            "->(y)<-[:CONTAINS]-(q:Package) " +
             "WHERE q.fqn = {0} " +
             "RETURN DISTINCT p")
     List<PackageEntity> findEfferents(String fqn);
+
 }
