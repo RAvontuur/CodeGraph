@@ -1,4 +1,4 @@
-package nl.rav.codegraph.controller;
+package nl.rav.codegraph.controller.drawing;
 
 import nl.rav.codegraph.service.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;

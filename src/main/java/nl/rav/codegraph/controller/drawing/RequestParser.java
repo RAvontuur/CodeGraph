@@ -1,4 +1,4 @@
-package nl.rav.codegraph.controller;
+package nl.rav.codegraph.controller.drawing;
 
 import org.springframework.web.util.UriTemplate;
 

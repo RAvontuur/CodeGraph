@@ -1,7 +1,7 @@
-package nl.rav.codegraph.controller;
+package nl.rav.codegraph.controller.drawing;
 
-import nl.rav.codegraph.controller.domain.Arrow;
-import nl.rav.codegraph.controller.domain.Rectangle;
+import nl.rav.codegraph.controller.drawing.domain.Arrow;
+import nl.rav.codegraph.controller.drawing.domain.Rectangle;
 import nl.rav.codegraph.domain.Drawing;
 import nl.rav.codegraph.domain.JavaPackage;
 import nl.rav.codegraph.domain.Level;
