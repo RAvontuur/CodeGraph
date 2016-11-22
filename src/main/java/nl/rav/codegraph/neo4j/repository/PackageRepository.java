@@ -22,13 +22,5 @@ public interface PackageRepository extends GraphRepository<PackageEntity> {
             "->(y)<-[:CONTAINS]-(q:Package) " +
             "WHERE p.fqn = {0} " +
             "RETURN DISTINCT q")
-    List<PackageEntity> findAfferents(String fqn);
-
-
-    @Query("MATCH (p:Package)-[:CONTAINS]->(x)-[:DEPENDS_ON]" +
-            "->(y)<-[:CONTAINS]-(q:Package) " +
-            "WHERE q.fqn = {0} " +
-            "RETURN DISTINCT p")
-    List<PackageEntity> findEfferents(String fqn);
-
+    List<PackageEntity> findPackagesDependingOn(String fqn);
 }

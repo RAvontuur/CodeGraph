@@ -30,24 +30,8 @@ public class PackageService {
         return convertToPackages(packageRepository.findChildren(fqn));
     }
 
-    /**
-     * afferent: is inward directed
-     *
-     * @param fqn
-     * @return
-     */
-    public List<JavaPackage> findAfferents(String fqn) {
-        return convertToPackages(packageRepository.findAfferents(fqn));
-    }
-
-    /**
-     * efferent: is outward directed
-     *
-     * @param fqn
-     * @return
-     */
-    public List<JavaPackage> findEfferents(String fqn) {
-        return convertToPackages(packageRepository.findEfferents(fqn));
+    public List<JavaPackage> findPackagesDependingOn(String fqn) {
+        return convertToPackages(packageRepository.findPackagesDependingOn(fqn));
     }
 
     private List<JavaPackage> convertToPackages(List<PackageEntity> childPackageEntities) {

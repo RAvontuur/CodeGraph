@@ -48,26 +48,17 @@ public class Neo4jTest {
     public void findChildren() {
         List<PackageEntity> children = packageRepository.findChildren("nl.rav.codegraph.neo4j");
 
-        for(PackageEntity afferent: children) {
-            System.out.println(afferent);
+        for(PackageEntity child: children) {
+            System.out.println(child);
         }
     }
 
     @Test
-    public void findAfferents() {
-        List<PackageEntity> afferents = packageRepository.findAfferents("nl.rav.codegraph.controller");
+    public void findDependencies() {
+        List<PackageEntity> packagesDependingOn = packageRepository.findPackagesDependingOn("nl.rav.codegraph.service");
 
-        for(PackageEntity afferent: afferents) {
-            System.out.println(afferent);
-        }
-    }
-
-    @Test
-    public void findEfferents() {
-        List<PackageEntity> efferents = packageRepository.findEfferents("nl.rav.codegraph.service");
-
-        for(PackageEntity efferent: efferents) {
-            System.out.println(efferent);
+        for(PackageEntity dependantPackage: packagesDependingOn) {
+            System.out.println(dependantPackage);
         }
     }
 }

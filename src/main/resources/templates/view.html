@@ -91,18 +91,18 @@
 					.append("line")
 					.style("stroke", "red")
 					.style("stroke-width", "1px")
-					.attr("x2", function(d) {
+					.attr("x1", function(d) {
                         return xScale(45 + (d.x1 * 60)); // - 5 * (d.y2 - d.y1));
                     })
-					.attr("y2", function(d) {
+					.attr("y1", function(d) {
 						if (d.y2 > d.y1) {
 							return yScale(yOffset + recHeight + d.y1 * cellHeight);
 						} else {
 							return yScale(yOffset + d.y1 * cellHeight);
 						}
 					})
-					.attr("x1", function(d) {return xScale(35 + d.x2 * 60);})
-					.attr("y1", function(d) {
+					.attr("x2", function(d) {return xScale(35 + d.x2 * 60);})
+					.attr("y2", function(d) {
 						if (d.y2 > d.y1) {
 							return yScale(5 + d.y2 * cellHeight);
 						} else {
