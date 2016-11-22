@@ -48,15 +48,15 @@ public class GraphService {
             dependency.setFrom(brother);
             dependencies.add(dependency);
 
-            List<JavaPackage> afferents = packageService.findAfferents(brother.getFqn());
+            List<JavaPackage> afferents = packageService.findEfferents(brother.getFqn());
             for (JavaPackage afferent : afferents) {
+                // ignore dependencies
+                // on other classes/interfaces outside parent-package
+                // on other classes/interfaces in its own package or its sub-packages
                 if (parentPackage.equalsOrContains(afferent) && !brother.equalsOrContains(afferent)) {
-                    // ignore dependencies
-                    // on other classes/interfaces outside parent-package
-                    // on other classes/interfaces in its own package or its sub-packages
-
-                    // assume for now: all dependencies are downwards
                     JavaPackage sister = findChildPackage(afferent, childPackages);
+                    // assume for now that all dependencies are downwards, later we will find the cycles
+                    // outwards directed = downwards
                     dependency.addDownwards(sister);
                 }
             }
