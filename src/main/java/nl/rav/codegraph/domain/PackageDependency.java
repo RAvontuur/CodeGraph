@@ -1,12 +1,14 @@
 package nl.rav.codegraph.domain;
 
+import nl.rav.codegraph.algorithm.assignment.AssignmentNode;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by rene on 20-11-16.
  */
-public class PackageDependency {
+public class PackageDependency implements AssignmentNode<JavaPackage> {
 
     private JavaPackage from;
 

@@ -1,12 +1,14 @@
 package nl.rav.codegraph.domain;
 
+import nl.rav.codegraph.algorithm.assignment.AssignmentOrder;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by rene on 20-11-16.
  */
-public class Level {
+public class Level implements AssignmentOrder<PackageDependency> {
 
     private int y;
     private List<PackageDependency> dependencies = new ArrayList<>();

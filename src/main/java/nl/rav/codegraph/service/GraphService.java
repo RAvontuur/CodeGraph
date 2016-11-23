@@ -1,5 +1,6 @@
 package nl.rav.codegraph.service;
 
+import nl.rav.codegraph.algorithm.assignment.AssignmentCalculator;
 import nl.rav.codegraph.domain.Drawing;
 import nl.rav.codegraph.domain.JavaPackage;
 import nl.rav.codegraph.domain.PackageDependency;
@@ -33,6 +34,10 @@ public class GraphService {
 
         Drawing drawing = new Drawing();
         drawing.generate(dependencies);
+
+        AssignmentCalculator calculator = new AssignmentCalculator();
+        calculator.calculate(drawing);
+
         return drawing;
     }
 
