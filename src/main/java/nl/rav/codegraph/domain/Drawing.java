@@ -16,6 +16,14 @@ public class Drawing implements AssignmentDiagram<Level> {
         return levels;
     }
 
+    @Override
+    public Level getLevel(int index) {
+        if (levels.size() <= index) {
+            levels.add(new Level(index));
+        }
+        return levels.get(index);
+    }
+
     public void generate(List<PackageDependency> dependencies) {
         for (PackageDependency dependency: dependencies) {
             Level level = new Level(levels.size());

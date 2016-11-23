@@ -2,6 +2,7 @@ package nl.rav.test.codegraph.algorithm.assignment;
 
 import nl.rav.codegraph.algorithm.assignment.AssignmentDiagram;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,5 +19,13 @@ public class TestAssignmentDiagram implements AssignmentDiagram<TestAssignmentOr
     @Override
     public List<TestAssignmentOrder> getLevels() {
         return levels;
+    }
+
+    @Override
+    public TestAssignmentOrder getLevel(int index) {
+        if (levels.size() <= index) {
+            levels.add(new TestAssignmentOrder(index, new ArrayList<TestAssignmentNode>()));
+        }
+        return levels.get(index);
     }
 }
