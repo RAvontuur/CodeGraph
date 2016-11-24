@@ -1,6 +1,8 @@
 package nl.rav.codegraph.service;
 
-import nl.rav.codegraph.algorithm.assignment.AssignmentCalculator;
+import nl.rav.codegraph.algorithm.assignment.CycleDetector;
+import nl.rav.codegraph.algorithm.assignment.TopDownOrganizer;
+import nl.rav.codegraph.controller.drawing.domain.Rectangle;
 import nl.rav.codegraph.domain.Drawing;
 import nl.rav.codegraph.domain.JavaPackage;
 import nl.rav.codegraph.domain.PackageDependency;
@@ -28,15 +30,22 @@ public class GraphService {
         this.packageService = packageService;
     }
 
+    public Rectangle justToCreateACyclicDependencyInThisProject() {
+        return new Rectangle();
+    }
+
     public Drawing createDrawingFor(String fqn) {
 
         List<PackageDependency> dependencies = generateDependencies(fqn);
 
+        CycleDetector detector = new CycleDetector();
+        detector.resolveCycles(dependencies);
+
         Drawing drawing = new Drawing();
         drawing.generate(dependencies);
 
-        AssignmentCalculator calculator = new AssignmentCalculator();
-        calculator.calculate(drawing);
+        TopDownOrganizer calculator = new TopDownOrganizer();
+        calculator.organize(drawing);
 
         return drawing;
     }

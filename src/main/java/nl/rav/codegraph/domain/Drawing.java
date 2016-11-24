@@ -25,10 +25,10 @@ public class Drawing implements AssignmentDiagram<Level> {
     }
 
     public void generate(List<PackageDependency> dependencies) {
+        Level level = new Level(levels.size());
+        levels.add(level);
         for (PackageDependency dependency: dependencies) {
-            Level level = new Level(levels.size());
             level.addDependeny(dependency);
-            levels.add(level);
         }
     }
 }

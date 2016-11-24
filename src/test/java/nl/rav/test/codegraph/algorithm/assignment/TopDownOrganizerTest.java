@@ -1,6 +1,6 @@
 package nl.rav.test.codegraph.algorithm.assignment;
 
-import nl.rav.codegraph.algorithm.assignment.AssignmentCalculator;
+import nl.rav.codegraph.algorithm.assignment.TopDownOrganizer;
 import nl.rav.codegraph.algorithm.assignment.AssignmentDiagram;
 import org.junit.Test;
 
@@ -14,15 +14,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * Created by rene on 23-11-16.
  */
-public class AssignmentCalculatorTest {
+public class TopDownOrganizerTest {
 
     @Test
     public void testCalculateNoDependencies() throws Exception {
 
         AssignmentDiagram diagram = createDiagramNoDependencies();
 
-        AssignmentCalculator calculator = new AssignmentCalculator();
-        calculator.calculate(diagram);
+        TopDownOrganizer calculator = new TopDownOrganizer();
+        calculator.organize(diagram);
 
         assertThat(diagram.getLevels().size(), is(1));
         TestAssignmentNode obj0 = (TestAssignmentNode) diagram.getLevel(0).getDependencies().get(0);
@@ -57,8 +57,8 @@ public class AssignmentCalculatorTest {
 
         AssignmentDiagram diagram = createDiagramOneDependency();
 
-        AssignmentCalculator calculator = new AssignmentCalculator();
-        calculator.calculate(diagram);
+        TopDownOrganizer calculator = new TopDownOrganizer();
+        calculator.organize(diagram);
 
         assertThat(diagram.getLevels().size(), is(2));
         TestAssignmentNode obj0 = (TestAssignmentNode) diagram.getLevel(0).getDependencies().get(0);

@@ -3,9 +3,10 @@ package nl.rav.codegraph.algorithm.assignment;
 /**
  * Created by rene on 23-11-16.
  */
-public class AssignmentCalculator {
+public class TopDownOrganizer {
 
-    public void calculate(AssignmentDiagram diagram) {
+    public void organize(AssignmentDiagram diagram) {
+
         int curLevel = 0;
         while (levelExists(diagram, curLevel)) {
             while (findUnknowns(diagram, curLevel)) {
