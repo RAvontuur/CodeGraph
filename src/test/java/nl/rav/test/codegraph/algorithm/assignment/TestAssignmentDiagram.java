@@ -6,7 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by rene on 23-11-16.
+ *
+ * The concept:
+ * https://en.wikipedia.org/wiki/Depth-first_search#Output_of_a_depth-first_search
+ * TODO: refactor such that this concept is expressed in a better way
+ *
+ *
  */
 public class TestAssignmentDiagram implements AssignmentDiagram<TestAssignmentOrder> {
 

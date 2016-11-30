@@ -35,4 +35,20 @@ public class JavaPackage {
                 ", name='" + name + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JavaPackage that = (JavaPackage) o;
+
+        return !(fqn != null ? !fqn.equals(that.fqn) : that.fqn != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return fqn != null ? fqn.hashCode() : 0;
+    }
 }

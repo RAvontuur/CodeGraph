@@ -56,7 +56,7 @@ public class Neo4jTest {
     @Test
     public void findDependencies() {
         List<PackageEntity> packagesDependingOn = packageRepository.findPackagesDependingOn("nl.rav.codegraph.controller");
-
+        System.out.println(" results: " + packagesDependingOn.size());
         for(PackageEntity dependantPackage: packagesDependingOn) {
             System.out.println(dependantPackage);
         }
