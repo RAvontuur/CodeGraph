@@ -1,4 +1,4 @@
-package nl.rav.codegraph.algorithm.assignment;
+package nl.rav.codegraph.algorithm.spanningtree;
 
 /**
  * Created by rene on 23-11-16.

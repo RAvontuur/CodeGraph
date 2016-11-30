@@ -1,6 +1,6 @@
 package nl.rav.test.codegraph.algorithm.assignment;
 
-import nl.rav.codegraph.algorithm.assignment.AssignmentDiagram;
+import nl.rav.codegraph.algorithm.spanningtree.AssignmentDiagram;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package nl.rav.codegraph.algorithm.assignment;
+package nl.rav.codegraph.algorithm.spanningtree;
 
 import java.util.List;
 

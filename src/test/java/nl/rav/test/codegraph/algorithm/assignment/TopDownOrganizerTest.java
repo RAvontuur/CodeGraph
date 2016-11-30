@@ -1,7 +1,7 @@
 package nl.rav.test.codegraph.algorithm.assignment;
 
-import nl.rav.codegraph.algorithm.assignment.TopDownOrganizer;
-import nl.rav.codegraph.algorithm.assignment.AssignmentDiagram;
+import nl.rav.codegraph.algorithm.spanningtree.TopDownOrganizer;
+import nl.rav.codegraph.algorithm.spanningtree.AssignmentDiagram;
 import org.junit.Test;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package nl.rav.codegraph.domain;
 
-import nl.rav.codegraph.algorithm.assignment.AssignmentNode;
+import nl.rav.codegraph.algorithm.spanningtree.AssignmentNode;
 
 import java.util.ArrayList;
 import java.util.List;

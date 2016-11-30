@@ -1,7 +1,6 @@
 package nl.rav.codegraph.service;
 
-import nl.rav.codegraph.algorithm.assignment.CycleDetector;
-import nl.rav.codegraph.algorithm.assignment.TopDownOrganizer;
+import nl.rav.codegraph.algorithm.spanningtree.TopDownOrganizer;
 import nl.rav.codegraph.controller.drawing.domain.Rectangle;
 import nl.rav.codegraph.domain.Drawing;
 import nl.rav.codegraph.domain.JavaPackage;
@@ -38,8 +37,8 @@ public class GraphService {
 
         List<PackageDependency> dependencies = generateDependencies(fqn);
 
-        CycleDetector detector = new CycleDetector();
-        detector.resolveCycles(dependencies);
+        //CycleDetector detector = new CycleDetector(edges);
+        //detector.resolveCycles(dependencies);
 
         Drawing drawing = new Drawing();
         drawing.generate(dependencies);
