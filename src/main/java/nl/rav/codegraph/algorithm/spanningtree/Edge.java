@@ -10,6 +10,7 @@ public class Edge {
     private final long fromId;
     private final long toId;
     private EdgeType edgeType = EdgeType.TREE;
+    private Long assignedParentId;
 
     public Edge(long fromId, long toId) {
         this.fromId = fromId;
@@ -30,6 +31,14 @@ public class Edge {
 
     public void setEdgeType(EdgeType edgeType) {
         this.edgeType = edgeType;
+    }
+
+    public Long getAssignedParentId() {
+        return assignedParentId;
+    }
+
+    public void setAssignedParentId(Long assignedParentId) {
+        this.assignedParentId = assignedParentId;
     }
 
     @Override
