@@ -1,10 +1,9 @@
 package nl.rav.codegraph.service;
 
-import nl.rav.codegraph.algorithm.spanningtree.TopDownOrganizer;
-import nl.rav.codegraph.controller.drawing.domain.Rectangle;
-import nl.rav.codegraph.domain.Drawing;
+import nl.rav.codegraph.algorithm.spanningtree.CycleDetector;
+import nl.rav.codegraph.algorithm.spanningtree.Edge;
+import nl.rav.codegraph.domain.Graph;
 import nl.rav.codegraph.domain.JavaPackage;
-import nl.rav.codegraph.domain.PackageDependency;
 import nl.rav.codegraph.neo4j.service.PackageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,42 +28,26 @@ public class GraphService {
         this.packageService = packageService;
     }
 
-    public Rectangle justToCreateACyclicDependencyInThisProject() {
-        return new Rectangle();
-    }
+    public Graph createGraph(String fqn) {
 
-    public Drawing createDrawingFor(String fqn) {
-
-        List<PackageDependency> dependencies = generateDependencies(fqn);
-
-        //CycleDetector detector = new CycleDetector(edges);
-        //detector.resolveCycles(dependencies);
-
-        Drawing drawing = new Drawing();
-        drawing.generate(dependencies);
-
-        TopDownOrganizer calculator = new TopDownOrganizer();
-        calculator.organize(drawing);
-
-        return drawing;
-    }
-
-    private List<PackageDependency> generateDependencies(String fqn) {
+        Graph graph = new Graph();
 
         List<JavaPackage> childPackages = packageService.findChildren(fqn);
-        List<PackageDependency> dependencies = new ArrayList<>();
+        childPackages.stream().forEach(javaPackage -> graph.addJavaPackage(javaPackage));
+
+        List<Edge> edges = new ArrayList<>();
 
         for (JavaPackage brother : childPackages) {
-            PackageDependency dependency = new PackageDependency();
-            dependency.setFrom(brother);
-            dependencies.add(dependency);
-
             List<JavaPackage> sisters = packageService.findPackagesDependingOn(brother.getFqn());
             for (JavaPackage sister : sisters) {
-                    dependency.addDownwards(sister);
+                edges.add(new Edge(brother.getId(), sister.getId()));
             }
         }
 
-        return dependencies;
+        CycleDetector detector = new CycleDetector(edges);
+        detector.resolveCycles();
+
+        graph.setEdges(edges);
+        return graph;
     }
 }

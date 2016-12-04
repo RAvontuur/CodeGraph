@@ -5,23 +5,26 @@ package nl.rav.codegraph.domain;
  */
 public class JavaPackage {
 
-    private String name;
-    private String fqn;
+    private final long id;
+    private final String name;
+    private final String fqn;
+
+    public JavaPackage(long id, String name, String fqn) {
+        this.id = id;
+        this.name = name;
+        this.fqn = fqn;
+    }
+
+    public long getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getFqn() {
         return fqn;
-    }
-
-    public void setFqn(String fqn) {
-        this.fqn = fqn;
     }
 
     public boolean equalsOrContains(JavaPackage pckage) {
@@ -31,8 +34,9 @@ public class JavaPackage {
     @Override
     public String toString() {
         return "JavaPackage{" +
-                "fqn='" + fqn + '\'' +
+                "id=" + id +
                 ", name='" + name + '\'' +
+                ", fqn='" + fqn + '\'' +
                 '}';
     }
 
@@ -43,12 +47,12 @@ public class JavaPackage {
 
         JavaPackage that = (JavaPackage) o;
 
-        return !(fqn != null ? !fqn.equals(that.fqn) : that.fqn != null);
+        return id == that.id;
 
     }
 
     @Override
     public int hashCode() {
-        return fqn != null ? fqn.hashCode() : 0;
+        return (int) (id ^ (id >>> 32));
     }
 }

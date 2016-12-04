@@ -44,9 +44,7 @@ public class PackageService {
     }
 
     private JavaPackage convertToPackage(PackageEntity child) {
-        JavaPackage pckage = new JavaPackage();
-        pckage.setFqn(child.getFqn());
-        pckage.setName(child.getName());
+        JavaPackage pckage = new JavaPackage(child.getId(), child.getName(), child.getFqn());
         return pckage;
     }
 }

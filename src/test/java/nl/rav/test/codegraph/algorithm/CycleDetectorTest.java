@@ -1,5 +1,10 @@
-package nl.rav.codegraph.algorithm.spanningtree;
+package nl.rav.test.codegraph.algorithm;
 
+import nl.rav.codegraph.algorithm.spanningtree.CycleDetector;
+import nl.rav.codegraph.algorithm.spanningtree.Edge;
+import nl.rav.codegraph.algorithm.spanningtree.EdgeType;
+import nl.rav.codegraph.algorithm.spanningtree.RootDetector;
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -31,7 +36,7 @@ public class CycleDetectorTest {
         CycleDetector detector = new CycleDetector(edges);
         detector.resolveCycles();
 
-        assertThat(edge1.getEdgeType(), is(EdgeType.TREE));
+        assertThat(edge1.getEdgeType(), Is.is(EdgeType.TREE));
         assertThat(edge2.getEdgeType(), is(EdgeType.TREE));
 
         List<Edge> parents = detector.findParentEdges(edge1);

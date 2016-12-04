@@ -54,9 +54,13 @@ public class BaseDetector {
     }
 
     public void traverseAllDepthFirst() {
+        traverseAllDepthFirst(allEdges());
+    }
+
+    public void traverseAllDepthFirst(List<Edge> startEdges) {
         clearAnalyzedEdges();
         List<Edge> pathEdges = new ArrayList<>();
-        allEdges().stream().filter(edge -> !isAnalyzed(edge)).forEach(edge -> {
+        startEdges.stream().filter(edge -> !isAnalyzed(edge)).forEach(edge -> {
             onVisitEdge(edge, null, pathEdges);
             traverse(edge, pathEdges);
             addToAnalyzed(edge);
@@ -64,7 +68,7 @@ public class BaseDetector {
     }
 
     // depth first search
-    private void traverse(Edge edge, List<Edge> pathEdges) {
+    protected void traverse(Edge edge, List<Edge> pathEdges) {
         pathEdges.add(edge);
 
         while (true) {
