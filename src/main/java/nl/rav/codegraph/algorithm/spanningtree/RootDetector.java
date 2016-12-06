@@ -20,7 +20,7 @@ public class RootDetector extends BaseDetector {
         clearAnalyzedEdges();
         for (Edge edge : allEdges()) {
             List<Edge> parents = findParentEdges(edge)
-                    .stream().filter(edge1 -> edge1.getEdgeType() != EdgeType.BACK)
+                    .stream().filter(edge1 -> edge1.getEdgeType() == EdgeType.TREE)
                     .collect(Collectors.toList());
 
             if (parents.isEmpty()) {

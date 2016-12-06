@@ -45,9 +45,6 @@ public class CycleDetectorTest {
         RootDetector rootDetector = new RootDetector(edges);
         List<Edge> roots =  rootDetector.findRootEdges();
         assertThat(roots, hasItems(edge1));
-
-        assertThat(detector.distanceToRoot(edge1), is(0));
-        assertThat(detector.distanceToRoot(edge2), is(1));
     }
 
     @Test
@@ -67,8 +64,6 @@ public class CycleDetectorTest {
         List<Edge> roots = rootDetector.findRootEdges();
         assertThat(roots, hasItems(edge1));
 
-        assertThat(detector.distanceToRoot(edge1), is(0));
-        assertThat(detector.distanceToRoot(edge2), is(1));
     }
 
     @Test
@@ -82,10 +77,8 @@ public class CycleDetectorTest {
         detector.resolveCycles();
 
         assertThat(edge1.getEdgeType(), is(EdgeType.TREE));
-        assertThat(edge2.getEdgeType(), is(EdgeType.CROSS));
+        assertThat(edge2.getEdgeType(), is(EdgeType.TREE));
 
-        assertThat(detector.distanceToRoot(edge1), is(0));
-        assertThat(detector.distanceToRoot(edge2), is(0));
     }
 
     @Test
@@ -101,15 +94,11 @@ public class CycleDetectorTest {
         CycleDetector detector = new CycleDetector(edges);
         detector.resolveCycles();
 
-        assertThat(edge1.getEdgeType(), is(EdgeType.FORWARD));
+        assertThat(edge1.getEdgeType(), is(EdgeType.TREE));
         assertThat(edge2.getEdgeType(), is(EdgeType.TREE));
         assertThat(edge3.getEdgeType(), is(EdgeType.TREE));
         assertThat(edge4.getEdgeType(), is(EdgeType.TREE));
 
-        assertThat(detector.distanceToRoot(edge1), is(0));
-        assertThat(detector.distanceToRoot(edge2), is(0));
-        assertThat(detector.distanceToRoot(edge3), is(1));
-        assertThat(detector.distanceToRoot(edge4), is(2));
     }
 
 
@@ -130,7 +119,7 @@ public class CycleDetectorTest {
         assertThat(edge2.getEdgeType(), is(EdgeType.TREE));
         assertThat(edge3.getEdgeType(), is(EdgeType.TREE));
         assertThat(edge4.getEdgeType(), is(EdgeType.TREE));
-        assertThat(edge5.getEdgeType(), is(EdgeType.CROSS));
+        assertThat(edge5.getEdgeType(), is(EdgeType.TREE));
     }
 
     @Test
@@ -218,7 +207,7 @@ public class CycleDetectorTest {
         detector.resolveCycles();
 
         assertThat(edge1.getEdgeType(), is(EdgeType.TREE));
-        assertThat(edge2.getEdgeType(), is(EdgeType.FORWARD));
+        assertThat(edge2.getEdgeType(), is(EdgeType.TREE));
         assertThat(edge3.getEdgeType(), is(EdgeType.TREE));
         assertThat(edge4.getEdgeType(), is(EdgeType.BACK));
         assertThat(edge5.getEdgeType(), is(EdgeType.BACK));
@@ -243,11 +232,11 @@ public class CycleDetectorTest {
         CycleDetector detector = new CycleDetector(edges);
         detector.resolveCycles();
 
-        assertThat(edge1.getEdgeType(), is(EdgeType.FORWARD));
+        assertThat(edge1.getEdgeType(), is(EdgeType.TREE));
         assertThat(edge2.getEdgeType(), is(EdgeType.BACK));
         assertThat(edge3.getEdgeType(), is(EdgeType.BACK));
         assertThat(edge4.getEdgeType(), is(EdgeType.BACK));
-        assertThat(edge5.getEdgeType(), is(EdgeType.FORWARD));
+        assertThat(edge5.getEdgeType(), is(EdgeType.TREE));
         assertThat(edge6.getEdgeType(), is(EdgeType.TREE));
 
         List<Edge> parents = detector.findParentEdges(edge2);

@@ -1,6 +1,7 @@
 package nl.rav.codegraph.controller.drawing.domain;
 
 import nl.rav.codegraph.algorithm.spanningtree.Edge;
+import nl.rav.codegraph.algorithm.spanningtree.EdgeType;
 import nl.rav.codegraph.algorithm.spanningtree.RootDetector;
 import nl.rav.codegraph.domain.Graph;
 import nl.rav.codegraph.domain.JavaPackage;
@@ -17,33 +18,34 @@ public class GraphConverter {
     public Drawing createDrawing(Graph graph) {
         Drawing drawing = new Drawing();
 
-        Browser browser = new Browser(graph, drawing);
+        RectanglesBrowser rectanglesBrowser = new RectanglesBrowser(graph, drawing);
 
         //add all packages with dependencies
-        browser.traverseAllDepthFirst(browser.findRootEdges());
+        rectanglesBrowser.traverseAllDepthFirst(rectanglesBrowser.findRootEdges());
 
         //add packages without dependendies
         graph.allJavaPackages().stream().forEach(javaPackage -> {
             Rectangle fromRectangle = drawing.getRectangles().get(javaPackage.getName());
             if (fromRectangle == null) {
                 int y1 = 0;
-                int x1 = browser.addToLevel(y1);
+                int x1 = rectanglesBrowser.addToLevel(y1);
                 drawing.addRectangle(javaPackage.getName(), x1, y1);
             }
         });
 
+        ArrowsBrowser arrowsBrowser = new ArrowsBrowser(graph, drawing);
+        arrowsBrowser.traverseAllDepthFirst();
 
         return drawing;
     }
 
-
-    class Browser extends RootDetector {
+    class RectanglesBrowser extends RootDetector {
         private final Graph graph;
         private final Drawing drawing;
 
         private final Map<Integer, Integer> levelMap = new HashMap<>();
 
-        public Browser(Graph graph, Drawing drawing) {
+        public RectanglesBrowser(Graph graph, Drawing drawing) {
             super(graph.getEdges());
             this.graph = graph;
             this.drawing = drawing;
@@ -63,6 +65,10 @@ public class GraphConverter {
         @Override
         protected boolean onVisitEdge(Edge edge, Edge parentEdge, List<Edge> pathEdges) {
 
+            if (edge.getEdgeType() != EdgeType.TREE) {
+                return false;
+            }
+
             JavaPackage from = graph.getJavaPackage(edge.getFromId());
             Rectangle fromRectangle = drawing.getRectangles().get(from.getName());
             if (fromRectangle == null) {
@@ -74,12 +80,34 @@ public class GraphConverter {
             JavaPackage to = graph.getJavaPackage(edge.getToId());
             Rectangle toRectangle = drawing.getRectangles().get(to.getName());
             if (toRectangle == null) {
-                int y2 = pathEdges.size();
+                int y2 = pathEdges.size() + 1;
                 int x2 = addToLevel(y2);
                 drawing.addRectangle(to.getName(), x2, y2);
             }
 
-            //TODO arrows
+            return true;
+        }
+    }
+
+    class ArrowsBrowser extends RootDetector {
+        private final Graph graph;
+        private final Drawing drawing;
+
+        public ArrowsBrowser(Graph graph, Drawing drawing) {
+            super(graph.getEdges());
+            this.graph = graph;
+            this.drawing = drawing;
+        }
+
+        @Override
+        protected boolean onVisitEdge(Edge edge, Edge parentEdge, List<Edge> pathEdges) {
+
+            JavaPackage from = graph.getJavaPackage(edge.getFromId());
+            Rectangle fromRectangle = drawing.getRectangles().get(from.getName());
+            JavaPackage to = graph.getJavaPackage(edge.getToId());
+            Rectangle toRectangle = drawing.getRectangles().get(to.getName());
+
+            drawing.addArrow(fromRectangle.getX(), fromRectangle.getY(), toRectangle.getX(), toRectangle.getY());
 
             return true;
         }

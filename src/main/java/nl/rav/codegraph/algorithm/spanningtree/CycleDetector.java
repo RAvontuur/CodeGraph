@@ -24,41 +24,30 @@ public class CycleDetector extends BaseDetector {
             return false;
         }
 
-        if ((edge.getAssignedParentId() == null) && (parentEdge != null)) {
-            edge.setAssignedParentId(parentEdge.getFromId());
-        }
-
-
-        List<Edge> crossEdges = findAnalyzedEdgesWithToId(edge.getToId());
-        if (!crossEdges.isEmpty()) {
-            boolean crossFound = false;
-            for (Edge forwardCandidateEdge : crossEdges) {
-                boolean forwardFound = false;
-                for (Edge pathEdge : pathEdges) {
-                    if (pathEdge.equals(edge)) {
-                        continue;
-                    }
-                    if (pathEdge.getFromId() == forwardCandidateEdge.getFromId()) {
-                        forwardCandidateEdge.setEdgeType(EdgeType.FORWARD);
-                        forwardFound = true;
-                    }
-                }
-                if (!forwardFound) {
-                    crossFound = true;
-                }
-            }
-            if (crossFound) {
-                edge.setEdgeType(EdgeType.CROSS);
-            } else {
-                claimAllChildren(edge);
-            }
-        }
+//        List<Edge> crossEdges = findAnalyzedEdgesWithToId(edge.getToId());
+//        if (!crossEdges.isEmpty()) {
+//            boolean crossFound = false;
+//            for (Edge forwardCandidateEdge : crossEdges) {
+//                boolean forwardFound = false;
+//                for (Edge pathEdge : pathEdges) {
+//                    if (pathEdge.equals(edge)) {
+//                        continue;
+//                    }
+//                    if (pathEdge.getFromId() == forwardCandidateEdge.getFromId()) {
+//                        forwardCandidateEdge.setEdgeType(EdgeType.FORWARD);
+//                        forwardFound = true;
+//                    }
+//                }
+//                if (!forwardFound) {
+//                    crossFound = true;
+//                }
+//            }
+//            if (crossFound) {
+//                edge.setEdgeType(EdgeType.CROSS);
+//            }
+//        }
 
         return true;
-    }
-
-    private void claimAllChildren(Edge parent) {
-        allEdges().stream().filter(edge1 -> edge1.getFromId() == parent.getToId()).forEach(edge2 -> edge2.setAssignedParentId(parent.getFromId()));
     }
 
 }

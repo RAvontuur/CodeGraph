@@ -25,16 +25,6 @@ public class BaseDetector {
         return allEdges().stream().filter(edge -> (edge.getFromId() == fromId) && (edge.getToId() == toId)).findFirst().orElse(null);
     }
 
-    public int distanceToRoot(Edge edge) {
-        int distance = 0;
-        Edge current = edge;
-        while ((current != null) && (current.getAssignedParentId() != null)) {
-            distance++;
-            current = findEdge(current.getAssignedParentId(), current.getFromId());
-        }
-        return distance;
-    }
-
     public void clearAnalyzedEdges() {
         analyzedEdges.clear();
     }
