@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by rene on 9-3-16.
+ * Rest-service returning objects to be drawn by d3.js
  */
 @RestController
 public class GraphController {

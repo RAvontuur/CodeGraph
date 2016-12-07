@@ -1,7 +1,5 @@
 package nl.rav.codegraph.controller.drawing;
 
-import nl.rav.codegraph.service.GraphService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -9,17 +7,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**
- * Created by rene on 13-3-16.
+ * display view html, containing d3.js code which calls the rest-service for data
  */
 @Controller
 public class ViewController {
-
-    private final GraphService graphService;
-
-    @Autowired
-    public ViewController(GraphService graphService) {
-        this.graphService = graphService;
-    }
 
     @RequestMapping("**/view")
     public String view(HttpServletRequest request) throws IOException {
