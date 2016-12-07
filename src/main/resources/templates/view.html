@@ -35,15 +35,14 @@
         function redraw() {
             queue()
                     .defer(d3.json, "data")
-                    .defer(d3.json, "arrows")
                     .await(
-                    function (error, file1, file2) {
+                    function (error, file1) {
                         console.log(file1);
-                        dataViz(file1, file2)
+                        dataViz(file1)
                     });
         }
 
-		function dataViz(packages, arrows) {
+		function dataViz(objects) {
 			var recHeight = 25;
 			var cellHeight = 40;
             var yOffset = 5;
@@ -52,10 +51,11 @@
 			var xScale = d3.scale.linear().domain([0,1000]).range([ 0, 1000 ]);
 			var yScale = d3.scale.linear().domain([0,800]).range([ 0, 800 ]);
 
-			d3.select("svg").selectAll("rect").data(packages)
+			d3.select("svg").selectAll("rect").data(objects)
 					.enter()
 					.append("rect")
-					.attr("width", xScale(50))
+                    .filter(function(d) { return d.name })
+                    .attr("width", xScale(50))
 					.attr("height",yScale(recHeight))
 					.attr("x", function(d) {return xScale(5 + d.x * 60);})
 					.attr("y", function(d) {return yScale(yOffset + d.y * cellHeight);})
@@ -64,13 +64,6 @@
 					.style("stroke-width", "1px")
 					.style("opacity", .25)
                     .on("click", rectClick);
-
-			d3.select("svg").selectAll("text").data(packages)
-					.enter()
-					.append("text")
-					.attr("x", function(d) {return xScale(30 + d.x * 60);})
-					.attr("y", function(d) {return yScale(yOffset + yNameOffset + d.y * cellHeight);})
-					.text( function(d) {return d.name;});
 
 // define marker
 			d3.select("svg").append("svg:defs").selectAll("marker")
@@ -86,10 +79,19 @@
 					.append("svg:path")
 					.attr("d", "M0,-2L4,0L0,0");
 
-			d3.select("svg").selectAll("line").data(arrows)
+            d3.select("svg").selectAll("text").data(objects)
+                    .enter()
+                    .append("text")
+                    .filter(function(d) { return d.name })
+                    .attr("x", function(d) {return xScale(30 + d.x * 60);})
+                    .attr("y", function(d) {return yScale(yOffset + yNameOffset + d.y * cellHeight);})
+                    .text( function(d) {return d.name;});
+
+			d3.select("svg").selectAll("line").data(objects)
 					.enter()
 					.append("line")
-					.style("stroke", "red")
+                    .filter(function(d) { return d.x1 })
+                    .style("stroke", "red")
 					.style("stroke-width", "1px")
 					.attr("x1", function(d) {
                         return xScale(45 + (d.x1 * 60)); // - 5 * (d.y2 - d.y1));
