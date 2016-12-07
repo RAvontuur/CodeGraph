@@ -2,8 +2,7 @@
 <head>
 	<title>Code Graph</title>
 	<meta charset="utf-8" />
-	<script src="/d3.v3.min.js" type="text/JavaScript"></script>
-	<script src="/queue.js" type="text/JavaScript"></script>
+	<script src="https://d3js.org/d3.v4.js" type="text/JavaScript"></script>
 </head>
 <style>
 	svg {
@@ -33,7 +32,7 @@
         redraw();
 
         function redraw() {
-            queue()
+            d3.queue()
                     .defer(d3.json, "data")
                     .await(
                     function (error, file1) {
@@ -48,8 +47,8 @@
             var yOffset = 5;
             var yNameOffset = 10;
 
-			var xScale = d3.scale.linear().domain([0,1000]).range([ 0, 1000 ]);
-			var yScale = d3.scale.linear().domain([0,800]).range([ 0, 800 ]);
+			var xScale = d3.scaleLinear().domain([0,500]).range([ 0, 1000 ]);
+			var yScale = d3.scaleLinear().domain([0,400]).range([ 0, 800 ]);
 
 			d3.select("svg").selectAll("rect").data(objects)
 					.enter()
