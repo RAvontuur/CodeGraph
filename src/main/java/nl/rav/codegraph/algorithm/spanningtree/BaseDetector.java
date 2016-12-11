@@ -51,9 +51,10 @@ public class BaseDetector {
         clearAnalyzedEdges();
         List<Edge> pathEdges = new ArrayList<>();
         startEdges.stream().filter(edge -> !isAnalyzed(edge)).forEach(edge -> {
-            onVisitEdge(edge, null, pathEdges);
-            traverse(edge, pathEdges);
-            addToAnalyzed(edge);
+            if  (onVisitEdge(edge, null, pathEdges)) {
+                traverse(edge, pathEdges);
+                addToAnalyzed(edge);
+            }
         });
     }
 
@@ -68,8 +69,10 @@ public class BaseDetector {
             }
             if (onVisitEdge(nextEdge, edge, pathEdges)) {
                 traverse(nextEdge, pathEdges);
+                addToAnalyzed(nextEdge);
+            } else {
+                break;
             }
-            addToAnalyzed(nextEdge);
         }
         pathEdges.remove(pathEdges.size() - 1);
     }

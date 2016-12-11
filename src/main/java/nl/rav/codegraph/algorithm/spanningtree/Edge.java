@@ -9,7 +9,7 @@ public class Edge {
 
     private final long fromId;
     private final long toId;
-    private EdgeType edgeType = EdgeType.TREE;
+    private EdgeType edgeType;
 
     public Edge(long fromId, long toId) {
         this.fromId = fromId;

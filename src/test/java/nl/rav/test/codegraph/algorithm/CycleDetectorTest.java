@@ -96,7 +96,7 @@ public class CycleDetectorTest {
 
         assertThat(edge1.getEdgeType(), is(EdgeType.TREE));
         assertThat(edge2.getEdgeType(), is(EdgeType.TREE));
-        assertThat(edge3.getEdgeType(), is(EdgeType.TREE));
+        assertThat(edge3.getEdgeType(), is(EdgeType.CROSS)); //TODO: FORWARD
         assertThat(edge4.getEdgeType(), is(EdgeType.TREE));
 
     }
@@ -210,8 +210,9 @@ public class CycleDetectorTest {
         assertThat(edge2.getEdgeType(), is(EdgeType.TREE));
         assertThat(edge3.getEdgeType(), is(EdgeType.TREE));
         assertThat(edge4.getEdgeType(), is(EdgeType.BACK));
-        assertThat(edge5.getEdgeType(), is(EdgeType.BACK));
-        assertThat(edge6.getEdgeType(), is(EdgeType.BACK));
+        // the remaining cycles share the same node, so  they are a CROSS instead of a BACK
+        assertThat(edge5.getEdgeType(), is(EdgeType.CROSS));
+        assertThat(edge6.getEdgeType(), is(EdgeType.CROSS));
 
         RootDetector rootDetector = new RootDetector(edges);
         List<Edge> roots = rootDetector.findRootEdges();
@@ -233,11 +234,12 @@ public class CycleDetectorTest {
         detector.resolveCycles();
 
         assertThat(edge1.getEdgeType(), is(EdgeType.TREE));
+        // longest path 2 - 1 - 3 - 1 contains a cycle
         assertThat(edge2.getEdgeType(), is(EdgeType.BACK));
-        assertThat(edge3.getEdgeType(), is(EdgeType.BACK));
-        assertThat(edge4.getEdgeType(), is(EdgeType.BACK));
+        assertThat(edge3.getEdgeType(), is(EdgeType.CROSS));
+        assertThat(edge4.getEdgeType(), is(EdgeType.CROSS));
         assertThat(edge5.getEdgeType(), is(EdgeType.TREE));
-        assertThat(edge6.getEdgeType(), is(EdgeType.TREE));
+        assertThat(edge6.getEdgeType(), is(EdgeType.CROSS));
 
         List<Edge> parents = detector.findParentEdges(edge2);
         assertThat(parents.size(), is(2));
