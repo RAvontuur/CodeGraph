@@ -1,7 +1,6 @@
 package nl.rav.codegraph.controller.drawing.domain;
 
 import nl.rav.codegraph.algorithm.spanningtree.Edge;
-import nl.rav.codegraph.algorithm.spanningtree.EdgeType;
 import nl.rav.codegraph.algorithm.spanningtree.RootDetector;
 import nl.rav.codegraph.domain.Graph;
 import nl.rav.codegraph.domain.JavaPackage;
@@ -9,6 +8,8 @@ import nl.rav.codegraph.domain.JavaPackage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static nl.rav.codegraph.algorithm.spanningtree.EdgeType.TREE;
 
 /**
  * Created by rene on 4-12-16.
@@ -34,7 +35,7 @@ public class GraphConverter {
         });
 
         ArrowsBrowser arrowsBrowser = new ArrowsBrowser(graph, drawing);
-        arrowsBrowser.traverseAllDepthFirst();
+        arrowsBrowser.drawArrows();
 
         return drawing;
     }
@@ -65,7 +66,7 @@ public class GraphConverter {
         @Override
         protected boolean onVisitEdge(Edge edge, Edge parentEdge, List<Edge> pathEdges) {
 
-            if (edge.getEdgeType() != EdgeType.TREE) {
+            if (edge.getEdgeType() != TREE) {
                 return false;
             }
 
@@ -89,28 +90,33 @@ public class GraphConverter {
         }
     }
 
-    class ArrowsBrowser extends RootDetector {
+    class ArrowsBrowser {
         private final Graph graph;
         private final Drawing drawing;
 
         public ArrowsBrowser(Graph graph, Drawing drawing) {
-            super(graph.getEdges());
             this.graph = graph;
             this.drawing = drawing;
         }
 
-        @Override
-        protected boolean onVisitEdge(Edge edge, Edge parentEdge, List<Edge> pathEdges) {
 
+        public void drawArrows() {
+            graph.getEdges().stream()
+                    .forEach(edge -> drawEdge(edge));
+
+        }
+
+        private void drawEdge(Edge edge) {
             JavaPackage from = graph.getJavaPackage(edge.getFromId());
             Rectangle fromRectangle = drawing.getRectangles().get(from.getName());
             JavaPackage to = graph.getJavaPackage(edge.getToId());
             Rectangle toRectangle = drawing.getRectangles().get(to.getName());
 
-            drawing.addArrow(fromRectangle.getX(), fromRectangle.getY(), toRectangle.getX(), toRectangle.getY());
-
-            return true;
+            drawing.addArrow(
+                    fromRectangle.getX(), fromRectangle.getY(),
+                    toRectangle.getX(), toRectangle.getY(),
+                    edge.getEdgeType().toString()
+            );
         }
     }
-
 }

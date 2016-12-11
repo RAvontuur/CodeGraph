@@ -16,6 +16,31 @@
         text-anchor: middle;
         pointer-events: none;
     }
+
+    rect.package {
+        fill: blue;
+        stroke: red;
+        stroke-width: 1px;
+        opacity: .25;
+    }
+
+    line.tree {
+        stroke: blue;
+        stroke-width: 1px;
+    }
+    line.back {
+        stroke: red;
+        stroke-width: 1px;
+    }
+    line.cross {
+        stroke: orange;
+        stroke-width: 1px;
+    }
+    line.forward {
+        stroke: yellow;
+        stroke-width: 1px;
+    }
+
 </style>
 <body>
 <div id="msg">
@@ -54,14 +79,11 @@
 					.enter()
 					.append("rect")
                     .filter(function(d) { return d.name })
+                    .attr("class", "package")
                     .attr("width", xScale(50))
 					.attr("height",yScale(recHeight))
 					.attr("x", function(d) {return xScale(5 + d.x * 60);})
 					.attr("y", function(d) {return yScale(yOffset + d.y * cellHeight);})
-					.style("fill", "blue")
-					.style("stroke", "red")
-					.style("stroke-width", "1px")
-					.style("opacity", .25)
                     .on("click", rectClick);
 
 // define marker
@@ -90,10 +112,14 @@
 					.enter()
 					.append("line")
                     .filter(function(d) { return d.x1 })
-                    .style("stroke", "red")
-					.style("stroke-width", "1px")
 					.attr("x1", function(d) {
-                        return xScale(45 + (d.x1 * 60)); // - 5 * (d.y2 - d.y1));
+                        if (d.arrowType == "tree") {
+                            // start from the middle
+                            return xScale(35 + (d.x1 * 60));
+                        } else {
+                            // start a bit right from the middle
+                            return xScale(45 + (d.x1 * 60));
+                        }
                     })
 					.attr("y1", function(d) {
 						if (d.y2 > d.y1) {
@@ -110,7 +136,7 @@
 							return yScale(yOffset + recHeight + d.y2 * cellHeight);
 						}
 					})
-					.attr("class", "link arrow")
+					.attr("class", function(d) { return "link arrow " + d.arrowType })
 					.attr("marker-end", "url(#arrow)");
 
 		}

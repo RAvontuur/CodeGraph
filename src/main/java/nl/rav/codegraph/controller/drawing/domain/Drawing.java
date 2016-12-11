@@ -29,8 +29,8 @@ public class Drawing {
         rectangles.put(name, rectangle);
     }
 
-    public void addArrow(int x1, int y1, int x2, int y2) {
-        Arrow arrow = new Arrow(x1, y1, x2, y2);
+    public void addArrow(int x1, int y1, int x2, int y2, String type) {
+        Arrow arrow = new Arrow(x1, y1, x2, y2, type);
         arrows.add(arrow);
     }
 }
