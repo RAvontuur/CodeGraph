@@ -172,7 +172,9 @@ public class TreeTest {
         assertTrue(libTree.containsNode(3));
         assertTrue(libTree.containsNode(4));
 
-        //TODO verify cross edges
+        // verify presence of cross edges
+        assertTrue(tree.hasCrossEdge(edge1));
+        assertTrue(newTree.hasCrossEdge(edge3));
     }
 
     @Test
@@ -186,8 +188,10 @@ public class TreeTest {
         assertThat(tree.addEdge(edge1).get(0), is(tree));
         assertThat(tree.addEdge(edge2).get(0), is(tree));
         List<Tree> treeList = tree.addEdge(edge3);
+        assertThat(treeList.size(), is(1));
 
-        //TODO verify
+        //TODO implement cycle support
+        assertTrue(tree.hasCycleEdge(edge3));
     }
 
     @Test
@@ -201,8 +205,46 @@ public class TreeTest {
         assertThat(tree.addEdge(edge1).get(0), is(tree));
         assertThat(tree.addEdge(edge2).get(0), is(tree));
         List<Tree> treeList = tree.addEdge(edge3);
+        assertThat(treeList.size(), is(1));
 
-        //TODO verify
+        //TODO implement forward support
+        assertTrue(tree.hasForwardEdge(edge3));
+    }
+
+    @Test
+    public void testAddTree() {
+        Edge edge1 = new Edge(1, 2);
+        Edge edge2 = new Edge(2, 3);
+        Edge edge3 = new Edge(3, 4);
+
+        Tree tree1 = new Tree();
+        tree1.addEdge(edge1);
+
+        Tree tree2 = new Tree();
+        tree2.addEdge(edge2);
+        tree2.addEdge(edge3);
+
+        // TODO implement
+        //if (tree1.canAddTree(tree2))
+        //tree1.addTree(tree2);
+    }
+
+    @Test
+    public void testAddTree2() {
+        Edge edge1 = new Edge(1, 2);
+        Edge edge2 = new Edge(2, 3);
+        Edge edge3 = new Edge(3, 4);
+
+        Tree tree1 = new Tree();
+        tree1.addEdge(edge1);
+
+        Tree tree2 = new Tree();
+        tree2.addEdge(edge2);
+        tree2.addEdge(edge3);
+
+        // TODO implement
+        //if (tree2.canAddTree(tree1))
+        //tree2.addTree(tree1);
     }
 
 

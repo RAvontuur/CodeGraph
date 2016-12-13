@@ -16,6 +16,9 @@ public class Tree {
     private Set<Long> nodes = new HashSet<>();
     //edges that connect this tree to the roots of other trees
     private Set<Edge> crossEdges = new HashSet<>();
+    private Set<Edge> cycleEdges = new HashSet<>();
+    private Set<Edge> forwardEdges = new HashSet<>();
+
     private boolean library = false;
 
     public Edge getRootEdge() {
@@ -28,6 +31,18 @@ public class Tree {
 
     public void setLibrary(boolean library) {
         this.library = library;
+    }
+
+    public boolean hasCrossEdge(Edge edge) {
+        return crossEdges.contains(edge);
+    }
+
+    public boolean hasCycleEdge(Edge edge) {
+        return cycleEdges.contains(edge);
+    }
+
+    public boolean hasForwardEdge(Edge edge) {
+        return forwardEdges.contains(edge);
     }
 
     public boolean containsNode(long id) {
