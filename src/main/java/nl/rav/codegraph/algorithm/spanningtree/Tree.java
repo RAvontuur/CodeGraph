@@ -16,9 +16,18 @@ public class Tree {
     private Set<Long> nodes = new HashSet<>();
     //edges that connect this tree to the roots of other trees
     private Set<Edge> crossEdges = new HashSet<>();
+    private boolean library = false;
 
     public Edge getRootEdge() {
         return rootEdge;
+    }
+
+    public boolean isLibrary() {
+        return library;
+    }
+
+    public void setLibrary(boolean library) {
+        this.library = library;
     }
 
     public boolean containsNode(long id) {
@@ -92,8 +101,17 @@ public class Tree {
     }
 
     private void makeLibrary(List<Tree> result, Edge edge) {
+
+        // 0. add the existing tree
+        result.add(this);
+        // 1. add the new edge as a new tree
+        makeNewTree(result, edge);
+        // 2. add the library tree
         result.add(splitTree(edge.getToId()));
-        //TODO add to crossEdges + new tree or attach to tree
+
+        result.get(0).crossEdges.add(result.get(0).findEdgeTo(edge.getToId()));
+        result.get(1).crossEdges.add(edge);
+        result.get(2).setLibrary(true);
     }
 
     private Tree splitTree(long id) {
@@ -105,7 +123,7 @@ public class Tree {
     }
 
     private void transferEdges(Tree tree, long fromId) {
-        Set<Edge> edgesFound = findEdges(fromId);
+        Set<Edge> edgesFound = findEdgesFrom(fromId);
         edgesFound.stream().forEach(edge -> {
             tree.addEdge(edge);
             edges.remove(edge);
@@ -114,7 +132,11 @@ public class Tree {
         nodes.remove(fromId);
     }
 
-    private Set<Edge> findEdges(long fromId) {
+    private Set<Edge> findEdgesFrom(long fromId) {
         return edges.stream().filter(edge -> edge.getFromId() == fromId).collect(Collectors.toSet());
+    }
+
+    private Edge findEdgeTo(long toId) {
+        return edges.stream().filter(edge -> edge.getToId() == toId).findFirst().orElse(null);
     }
 }

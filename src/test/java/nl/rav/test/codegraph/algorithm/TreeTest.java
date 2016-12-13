@@ -4,9 +4,12 @@ import nl.rav.codegraph.algorithm.spanningtree.Edge;
 import nl.rav.codegraph.algorithm.spanningtree.Tree;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -87,7 +90,7 @@ public class TreeTest {
     }
 
     @Test
-    public void testNewTree() {
+    public void testIndependentNewTree() {
 
         Edge edge1 = new Edge(1, 2);
         Edge edge2 = new Edge(3, 4);
@@ -129,9 +132,10 @@ public class TreeTest {
         Tree tree = new Tree();
         assertThat(tree.addEdge(edge1).get(0), is(tree));
         assertThat(tree.addEdge(edge2).get(0), is(tree));
-        Tree newTree = tree.addEdge(edge3).get(0);
+        List<Tree> treeList = tree.addEdge(edge3);
 
-        // tree
+        // tree (original)
+        assertThat(treeList.get(0), is(tree));
         assertThat(tree.getRootEdge(), is(edge1));
 
         assertThat(tree.edgeSize(), is(1));
@@ -142,18 +146,64 @@ public class TreeTest {
         assertTrue(tree.containsNode(1));
         assertTrue(tree.containsNode(3));
 
-        // new tree I
-        assertThat(newTree.getRootEdge(), is(edge2));
+        // new tree (containing the added edge)
+        Tree newTree = treeList.get(1);
+        assertFalse(newTree.isLibrary());
+        assertThat(newTree.getRootEdge(), is(edge3));
 
         assertThat(newTree.edgeSize(), is(1));
         assertThat(newTree.nodeSize(), is(2));
 
-        assertTrue(newTree.containsEdge(edge2));
+        assertTrue(newTree.containsEdge(edge3));
 
+        assertTrue(newTree.containsNode(2));
         assertTrue(newTree.containsNode(3));
-        assertTrue(newTree.containsNode(4));
 
-        // new tree II
-        // TODO
+        // new tree (the library)
+        Tree libTree = treeList.get(2);
+        assertTrue(libTree.isLibrary());
+        assertThat(libTree.getRootEdge(), is(edge2));
+
+        assertThat(libTree.edgeSize(), is(1));
+        assertThat(libTree.nodeSize(), is(2));
+
+        assertTrue(libTree.containsEdge(edge2));
+
+        assertTrue(libTree.containsNode(3));
+        assertTrue(libTree.containsNode(4));
+
+        //TODO verify cross edges
     }
+
+    @Test
+    public void testCycle() {
+
+        Edge edge1 = new Edge(1, 2);
+        Edge edge2 = new Edge(2, 3);
+        Edge edge3 = new Edge(3, 1);
+
+        Tree tree = new Tree();
+        assertThat(tree.addEdge(edge1).get(0), is(tree));
+        assertThat(tree.addEdge(edge2).get(0), is(tree));
+        List<Tree> treeList = tree.addEdge(edge3);
+
+        //TODO verify
+    }
+
+    @Test
+    public void testForward() {
+
+        Edge edge1 = new Edge(1, 2);
+        Edge edge2 = new Edge(2, 3);
+        Edge edge3 = new Edge(1, 3);
+
+        Tree tree = new Tree();
+        assertThat(tree.addEdge(edge1).get(0), is(tree));
+        assertThat(tree.addEdge(edge2).get(0), is(tree));
+        List<Tree> treeList = tree.addEdge(edge3);
+
+        //TODO verify
+    }
+
+
 }
