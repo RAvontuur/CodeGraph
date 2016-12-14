@@ -28,7 +28,7 @@ public class TreeTest {
         assertThat(tree.addEdge(edge1).get(0), is(tree));
         assertThat(tree.addEdge(edge2).get(0), is(tree));
 
-        assertThat(tree.getRootEdge(), is(edge1));
+        assertThat(tree.getRootNode(), is(1L));
 
         assertThat(tree.edgeSize(), is(2));
         assertThat(tree.nodeSize(), is(3));
@@ -52,7 +52,7 @@ public class TreeTest {
         assertThat(tree.addEdge(edge1).get(0), is(tree));
         assertThat(tree.addEdge(edge2).get(0), is(tree));
 
-        assertThat(tree.getRootEdge(), is(edge2));
+        assertThat(tree.getRootNode(), is(1L));
 
         assertThat(tree.edgeSize(), is(2));
         assertThat(tree.nodeSize(), is(3));
@@ -76,7 +76,7 @@ public class TreeTest {
         assertThat(tree.addEdge(edge1).get(0), is(tree));
         assertTrue(tree.addEdge(edge2).isEmpty());
 
-        assertThat(tree.getRootEdge(), is(edge1));
+        assertThat(tree.getRootNode(), is(1L));
 
         assertThat(tree.edgeSize(), is(1));
         assertThat(tree.nodeSize(), is(2));
@@ -86,6 +86,30 @@ public class TreeTest {
 
         assertTrue(tree.containsNode(1));
         assertTrue(tree.containsNode(2));
+
+    }
+
+    @Test
+    public void testNoCommonRootEdge() {
+
+        Edge edge1 = new Edge(1, 2);
+        Edge edge2 = new Edge(1, 3);
+
+        Tree tree = new Tree();
+        assertThat(tree.addEdge(edge1).get(0), is(tree));
+        assertThat(tree.addEdge(edge2).get(0), is(tree));
+
+        assertThat(tree.getRootNode(), is(1L));
+
+        assertThat(tree.edgeSize(), is(2));
+        assertThat(tree.nodeSize(), is(3));
+
+        assertTrue(tree.containsEdge(edge1));
+        assertTrue(tree.containsEdge(edge2));
+
+        assertTrue(tree.containsNode(1));
+        assertTrue(tree.containsNode(2));
+        assertTrue(tree.containsNode(3));
 
     }
 
@@ -100,7 +124,7 @@ public class TreeTest {
         Tree newTree = tree.addEdge(edge2).get(0);
         assertThat(newTree, not(is(tree)));
 
-        assertThat(tree.getRootEdge(), is(edge1));
+        assertThat(tree.getRootNode(), is(1L));
 
         assertThat(tree.edgeSize(), is(1));
         assertThat(tree.nodeSize(), is(2));
@@ -111,7 +135,7 @@ public class TreeTest {
         assertTrue(tree.containsNode(2));
 
         // new tree
-        assertThat(newTree.getRootEdge(), is(edge2));
+        assertThat(newTree.getRootNode(), is(3L));
 
         assertThat(newTree.edgeSize(), is(1));
         assertThat(newTree.nodeSize(), is(2));
@@ -136,15 +160,13 @@ public class TreeTest {
 
         // tree (original)
         assertThat(treeList.get(0), is(tree));
-        assertThat(tree.getRootEdge(), is(edge1));
-
+        assertThat(tree.getRootNode(), is(1L));
         assertThat(tree.edgeSize(), is(1));
         assertTrue(tree.containsEdge(edge1));
 
         // new tree (containing the added edge)
         Tree newTree = treeList.get(1);
-        assertThat(newTree.getRootEdge(), is(edge2));
-
+        assertThat(newTree.getRootNode(), is(2L));
         assertThat(newTree.edgeSize(), is(1));
         assertTrue(newTree.containsEdge(edge2));
 
@@ -170,15 +192,13 @@ public class TreeTest {
 
         // tree (original)
         assertThat(treeList.get(0), is(tree));
-        assertThat(tree.getRootEdge(), is(edge1));
-
+        assertThat(tree.getRootNode(), is(1L));
         assertThat(tree.edgeSize(), is(1));
         assertTrue(tree.containsEdge(edge1));
 
         // new tree (containing the added edge)
         Tree newTree = treeList.get(1);
-        assertThat(newTree.getRootEdge(), is(edge3));
-
+        assertThat(newTree.getRootNode(), is(3L));
         assertThat(newTree.edgeSize(), is(1));
         assertTrue(newTree.containsEdge(edge3));
 
@@ -201,8 +221,7 @@ public class TreeTest {
 
         // tree (original)
         assertThat(treeList.get(0), is(tree));
-        assertThat(tree.getRootEdge(), is(edge1));
-
+        assertThat(tree.getRootNode(), is(1L));
         assertThat(tree.edgeSize(), is(1));
         assertThat(tree.nodeSize(), is(2));
 
@@ -213,8 +232,7 @@ public class TreeTest {
 
         // new tree (containing the added edge)
         Tree newTree = treeList.get(1);
-        assertThat(newTree.getRootEdge(), is(edge3));
-
+        assertThat(newTree.getRootNode(), is(2L));
         assertThat(newTree.edgeSize(), is(1));
         assertThat(newTree.nodeSize(), is(2));
 
@@ -225,8 +243,7 @@ public class TreeTest {
 
         // new tree (the library)
         Tree libTree = treeList.get(2);
-        assertThat(libTree.getRootEdge(), is(edge2));
-
+        assertThat(libTree.getRootNode(), is(3L));
         assertThat(libTree.edgeSize(), is(1));
         assertThat(libTree.nodeSize(), is(2));
 

@@ -15,7 +15,7 @@ public class Graph {
 
     public List<Tree> getSortedTrees() {
         return trees.stream()
-                .sorted((o1, o2) -> (int) (o1.getRootEdge().getFromId() - o2.getRootEdge().getFromId()))
+                .sorted((o1, o2) -> (int) (o1.getRootNode() - o2.getRootNode()))
                 .collect(Collectors.toList());
     }
 
@@ -25,8 +25,8 @@ public class Graph {
 
         Tree singleEdgeTree = new Tree(edge);
         trees.stream().forEach(tree -> {
-            if (tree.hasCrossNode(singleEdgeTree.getRootEdge().getToId())) {
-                singleEdgeTree.getCrossEdges().add(singleEdgeTree.getRootEdge());
+            if (tree.hasCrossNode(edge.getToId())) {
+                singleEdgeTree.getCrossEdges().add(edge);
             }
         });
 

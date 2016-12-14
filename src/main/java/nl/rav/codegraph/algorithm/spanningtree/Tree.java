@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  */
 public class Tree {
 
-    private Edge rootEdge;
+    private Long rootNode;
     private Set<Edge> edges = new HashSet<>();
     private Set<Long> nodes = new HashSet<>();
 
@@ -31,8 +31,8 @@ public class Tree {
         //do nothing
     }
 
-    public Edge getRootEdge() {
-        return rootEdge;
+    public Long getRootNode() {
+        return rootNode;
     }
 
     public boolean hasCrossEdge(Edge edge) {
@@ -76,7 +76,7 @@ public class Tree {
             //do nothing
         } else if (isRootEdge(edge)) {
             //new root
-            rootEdge = edge;
+            rootNode = edge.getFromId();
             addEdgeAndNodes(result, edge);
         } else if (isCycleMakingEdge(edge)) {
             makeCycle(result, edge);
@@ -103,7 +103,7 @@ public class Tree {
         if (this == tree) {
             return false;
         }
-        if (this.hasCrossNode(tree.rootEdge.getFromId()) || tree.hasCrossNode(this.rootEdge.getFromId())) {
+        if (this.hasCrossNode(tree.rootNode) || tree.hasCrossNode(this.rootNode)) {
             return false;
         }
 
@@ -121,7 +121,7 @@ public class Tree {
 
         new DepthFirstTraversal(tree) {
             @Override
-            public boolean onVisitEdge(Edge edge, Edge parentEdge, List<Edge> pathEdges) {
+            public boolean onVisitEdge(Edge edge) {
 
                 List<Tree> modified = addEdge(edge);
 
@@ -150,8 +150,7 @@ public class Tree {
     }
 
     private boolean isRootEdge(Edge edge) {
-        return (rootEdge == null) ||
-                ((rootEdge.getFromId() == edge.getToId()) && (!nodes.contains(edge.getFromId())));
+        return (rootNode == null) || ((edge.getToId() == rootNode) && (!nodes.contains(edge.getFromId())));
     }
 
     private boolean isIsolatedEdge(Edge edge) {
@@ -206,7 +205,7 @@ public class Tree {
     }
 
     private boolean isLibraryMakingEdge(Edge edge) {
-        return nodes.contains(edge.getToId()) && (rootEdge.getFromId() != edge.getToId());
+        return nodes.contains(edge.getToId()) && (rootNode != edge.getToId());
     }
 
     private void makeLibrary(List<Tree> result, Edge edge) {

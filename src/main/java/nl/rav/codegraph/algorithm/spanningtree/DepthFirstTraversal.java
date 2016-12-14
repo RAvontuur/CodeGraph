@@ -21,39 +21,33 @@ public abstract class DepthFirstTraversal {
     public DepthFirstTraversal(Tree tree) {
         this.tree = tree;
         analyzedEdges.clear();
-        List<Edge> pathEdges = new ArrayList<>();
 
-        if (onVisitEdge(tree.getRootEdge(), null, pathEdges)) {
-            traverse(tree.getRootEdge(), pathEdges);
-            analyzedEdges.add(tree.getRootEdge());
-        }
+        traverse(tree.getRootNode());
     }
 
-    public abstract boolean onVisitEdge(Edge edge, Edge parentEdge, List<Edge> pathEdges);
+    public abstract boolean onVisitEdge(Edge edge);
 
     // depth first search
-    private void traverse(Edge edge, List<Edge> pathEdges) {
-        pathEdges.add(edge);
+    private void traverse(Long nodeId) {
 
         while (true) {
-            Edge nextEdge = findNextEdge(edge);
+            Edge nextEdge = findNextEdge(nodeId);
             if (nextEdge == null) {
                 break;
             }
-            if (onVisitEdge(nextEdge, edge, pathEdges)) {
-                traverse(nextEdge, pathEdges);
+            if (onVisitEdge(nextEdge)) {
+                traverse(nextEdge.getToId());
                 analyzedEdges.add(nextEdge);
             } else {
                 break;
             }
         }
-        pathEdges.remove(pathEdges.size() - 1);
     }
 
 
-    private Edge findNextEdge(Edge edge) {
+    private Edge findNextEdge(long nodeId) {
         return tree.getEdges().stream()
-                .filter(edge1 -> edge1.getFromId() == edge.getToId())
+                .filter(edge1 -> edge1.getFromId() == nodeId)
                 .filter(edge2 -> !analyzedEdges.contains(edge2))
                 .findFirst().orElse(null);
     }
