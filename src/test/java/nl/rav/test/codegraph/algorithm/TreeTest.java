@@ -190,9 +190,27 @@ public class TreeTest {
         List<Tree> treeList = tree.addEdge(edge3);
         assertThat(treeList.size(), is(1));
 
-        //TODO implement cycle support
         assertTrue(tree.hasCycleEdge(edge3));
+        assertFalse(tree.containsEdge(edge3));
     }
+
+    @Test
+    public void testCycle2() {
+
+        Edge edge1 = new Edge(1, 2);
+        Edge edge2 = new Edge(3, 1);
+        Edge edge3 = new Edge(2, 3);
+
+        Tree tree = new Tree();
+        assertThat(tree.addEdge(edge1).get(0), is(tree));
+        assertThat(tree.addEdge(edge2).get(0), is(tree));
+        List<Tree> treeList = tree.addEdge(edge3);
+        assertThat(treeList.size(), is(1));
+
+        assertTrue(tree.hasCycleEdge(edge3));
+        assertFalse(tree.containsEdge(edge3));
+    }
+
 
     @Test
     public void testForward() {
@@ -207,8 +225,25 @@ public class TreeTest {
         List<Tree> treeList = tree.addEdge(edge3);
         assertThat(treeList.size(), is(1));
 
-        //TODO implement forward support
         assertTrue(tree.hasForwardEdge(edge3));
+        assertFalse(tree.containsEdge(edge3));
+    }
+
+    @Test
+    public void testForward2() {
+
+        Edge edge1 = new Edge(1, 2);
+        Edge edge2 = new Edge(1, 3);
+        Edge edge3 = new Edge(2, 3);
+
+        Tree tree = new Tree();
+        assertThat(tree.addEdge(edge1).get(0), is(tree));
+        assertThat(tree.addEdge(edge2).get(0), is(tree));
+        List<Tree> treeList = tree.addEdge(edge3);
+        assertThat(treeList.size(), is(1));
+
+        assertTrue(tree.hasForwardEdge(edge2));
+        assertFalse(tree.containsEdge(edge2));
     }
 
     @Test

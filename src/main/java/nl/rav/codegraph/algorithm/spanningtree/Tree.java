@@ -7,18 +7,23 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Created by rene on 11-12-16.
+ * a tree is a special kind of a graph
+ * this tree class keeps also track of cross, cycle and forward edges
  */
 public class Tree {
 
     private Edge rootEdge;
     private Set<Edge> edges = new HashSet<>();
     private Set<Long> nodes = new HashSet<>();
-    //edges that connect this tree to the roots of other trees
+
+    // cross edges are edges that connect this tree to the roots of other trees
     private Set<Edge> crossEdges = new HashSet<>();
+    // a cycle edge: an edge that causes a cycle within this tree
     private Set<Edge> cycleEdges = new HashSet<>();
+    // a forward edge:
     private Set<Edge> forwardEdges = new HashSet<>();
 
+    // library = true: other trees have connections to the root of this tree
     private boolean library = false;
 
     public Edge getRootEdge() {
@@ -62,8 +67,10 @@ public class Tree {
     }
 
     /**
+     * add an edge to this tree object
+     *
      * @param edge
-     * @return list of modified or new trees
+     * @return list containing this tree (if modified) and if applicable the new trees (due to adding the edge)
      */
     public List<Tree> addEdge(Edge edge) {
         List<Tree> result = new ArrayList<>();
@@ -74,6 +81,10 @@ public class Tree {
             //new root
             rootEdge = edge;
             addEdgeAndNodes(result, edge);
+        } else if (isCycleMakingEdge(edge)) {
+            makeCycle(result, edge);
+        } else if (isForwardMakingEdge(edge)) {
+            makeForward(result, edge);
         } else if (isLibraryMakingEdge(edge)) {
             makeLibrary(result, edge);
         } else if (isIsolatedEdge(edge)) {
@@ -111,22 +122,74 @@ public class Tree {
         result.add(tree);
     }
 
+    private boolean isCycleMakingEdge(Edge edge) {
+        if (nodes.contains(edge.getToId()) && nodes.contains(edge.getFromId())) {
+            Edge edgeTo = edge;
+            while (true) {
+                edgeTo = findEdgeTo(edgeTo.getFromId());
+                if (edgeTo == null) {
+                    return false;
+                }
+                if (edgeTo.getFromId() == edge.getToId()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void makeCycle(List<Tree> result, Edge edge) {
+        result.add(this);
+        cycleEdges.add(edge);
+    }
+
+    private boolean isForwardMakingEdge(Edge edge) {
+        if (nodes.contains(edge.getToId()) && nodes.contains(edge.getFromId())) {
+            Edge edgeTo = new Edge(edge.getToId(), edge.getFromId());
+            while (true) {
+                edgeTo = findEdgeTo(edgeTo.getFromId());
+                if (edgeTo == null) {
+                    break;
+                }
+                if (edgeTo.getFromId() == edge.getFromId()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void makeForward(List<Tree> result, Edge edge) {
+        result.add(this);
+        forwardEdges.add(edge);
+    }
+
     private boolean isLibraryMakingEdge(Edge edge) {
-        return nodes.contains(edge.getToId()) && (rootEdge != null) && (rootEdge.getFromId() != edge.getToId());
+        return nodes.contains(edge.getToId()) && (rootEdge.getFromId() != edge.getToId());
     }
 
     private void makeLibrary(List<Tree> result, Edge edge) {
 
-        // 0. add the existing tree
-        result.add(this);
-        // 1. add the new edge as a new tree
-        makeNewTree(result, edge);
-        // 2. add the library tree
-        result.add(splitTree(edge.getToId()));
+        if (nodes.contains(edge.getFromId())) {
+            // it is internal
+            Edge forwardEdge = findEdgeTo(edge.getToId());
+            forwardEdges.add(forwardEdge);
+            edges.remove(forwardEdge);
+            addEdgeAndNodes(result, edge);
+        } else {
+            // it is to another library tree
 
-        result.get(0).crossEdges.add(result.get(0).findEdgeTo(edge.getToId()));
-        result.get(1).crossEdges.add(edge);
-        result.get(2).setLibrary(true);
+            // 0. add the existing tree
+            result.add(this);
+            // 1. add the new edge as a new tree
+            makeNewTree(result, edge);
+            // 2. add the library tree
+            result.add(splitTree(edge.getToId()));
+
+            result.get(0).crossEdges.add(result.get(0).findEdgeTo(edge.getToId()));
+            result.get(1).crossEdges.add(edge);
+            result.get(2).setLibrary(true);
+        }
     }
 
     private Tree splitTree(long id) {
