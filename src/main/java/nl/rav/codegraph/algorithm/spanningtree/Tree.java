@@ -26,6 +26,14 @@ public class Tree {
     // library = true: other trees have connections to the root of this tree
     private boolean library = false;
 
+    public Tree(Edge edge) {
+        addEdge(edge);
+    }
+
+    public Tree() {
+        //do nothing
+    }
+
     public Edge getRootEdge() {
         return rootEdge;
     }
@@ -103,6 +111,10 @@ public class Tree {
      * @return
      */
     public boolean canAddTree(Tree tree) {
+        if (tree == this) {
+            return false;
+        }
+
         if (!tree.isLibrary() && this.containsNode(tree.rootEdge.getFromId())) {
             return true;
         }
@@ -143,8 +155,7 @@ public class Tree {
     }
 
     private void makeNewTree(List<Tree> result, Edge edge) {
-        Tree tree = new Tree();
-        tree.addEdge(edge);
+        Tree tree = new Tree(edge);
         result.add(tree);
     }
 
