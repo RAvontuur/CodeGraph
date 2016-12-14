@@ -251,6 +251,9 @@ public class TreeTest {
         Edge edge1 = new Edge(1, 2);
         Edge edge2 = new Edge(2, 3);
         Edge edge3 = new Edge(3, 4);
+        Edge edge4 = new Edge(3, 5);
+        Edge edge5 = new Edge(5, 6);
+        Edge edge6 = new Edge(5, 7);
 
         Tree tree1 = new Tree();
         tree1.addEdge(edge1);
@@ -258,29 +261,84 @@ public class TreeTest {
         Tree tree2 = new Tree();
         tree2.addEdge(edge2);
         tree2.addEdge(edge3);
+        tree2.addEdge(edge4);
+        tree2.addEdge(edge5);
+        tree2.addEdge(edge6);
 
-        // TODO implement
-        //if (tree1.canAddTree(tree2))
-        //tree1.addTree(tree2);
+        assertTrue(tree1.canAddTree(tree2));
+        tree1.addTree(tree2);
+
+        assertTrue(tree1.containsEdge(edge1));
+        assertTrue(tree1.containsEdge(edge2));
+        assertTrue(tree1.containsEdge(edge3));
+        assertTrue(tree1.containsEdge(edge4));
+        assertTrue(tree1.containsEdge(edge5));
+        assertTrue(tree1.containsEdge(edge6));
     }
 
     @Test
-    public void testAddTree2() {
+    public void testAddTreeWithForward() {
+
         Edge edge1 = new Edge(1, 2);
         Edge edge2 = new Edge(2, 3);
-        Edge edge3 = new Edge(3, 4);
+
+        Edge edge3 = new Edge(2, 4);
+        Edge edge4 = new Edge(4, 3);
+        Edge edge5 = new Edge(3, 5);
+        Edge edge6 = new Edge(3, 6);
 
         Tree tree1 = new Tree();
         tree1.addEdge(edge1);
+        tree1.addEdge(edge2);
 
         Tree tree2 = new Tree();
-        tree2.addEdge(edge2);
         tree2.addEdge(edge3);
+        tree2.addEdge(edge4);
+        tree2.addEdge(edge5);
+        tree2.addEdge(edge6);
 
-        // TODO implement
-        //if (tree2.canAddTree(tree1))
-        //tree2.addTree(tree1);
+        assertTrue(tree1.canAddTree(tree2));
+        tree1.addTree(tree2);
+
+        assertTrue(tree1.containsEdge(edge1));
+        assertTrue(tree1.hasForwardEdge(edge2));
+        assertTrue(tree1.containsEdge(edge3));
+        assertTrue(tree1.containsEdge(edge4));
+        assertTrue(tree1.containsEdge(edge5));
+        assertTrue(tree1.containsEdge(edge6));
     }
 
+
+    @Test
+    public void testAddTreeWithCycle() {
+
+        Edge edge1 = new Edge(1, 2);
+        Edge edge2 = new Edge(2, 3);
+
+        Edge edge3 = new Edge(2, 4);
+        Edge edge4 = new Edge(4, 5);
+        Edge edge5 = new Edge(5, 1);
+        Edge edge6 = new Edge(5, 6);
+
+        Tree tree1 = new Tree();
+        tree1.addEdge(edge1);
+        tree1.addEdge(edge2);
+
+        Tree tree2 = new Tree();
+        tree2.addEdge(edge3);
+        tree2.addEdge(edge4);
+        tree2.addEdge(edge5);
+        tree2.addEdge(edge6);
+
+        assertTrue(tree1.canAddTree(tree2));
+        tree1.addTree(tree2);
+
+        assertTrue(tree1.containsEdge(edge1));
+        assertTrue(tree1.containsEdge(edge2));
+        assertTrue(tree1.containsEdge(edge3));
+        assertTrue(tree1.containsEdge(edge4));
+        assertTrue(tree1.hasCycleEdge(edge5));
+        assertTrue(tree1.containsEdge(edge6));
+    }
 
 }

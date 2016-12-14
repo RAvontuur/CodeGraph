@@ -96,6 +96,32 @@ public class Tree {
         return result;
     }
 
+    /**
+     * verifies whether tree can be added to one of the end nodes
+     *
+     * @param tree
+     * @return
+     */
+    public boolean canAddTree(Tree tree) {
+        if (!tree.isLibrary() && this.containsNode(tree.rootEdge.getFromId())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public void addTree(Tree tree) {
+
+        new DepthFirstTraversal(tree) {
+            @Override
+            public boolean onVisitEdge(Edge edge, Edge parentEdge, List<Edge> pathEdges) {
+                addEdge(edge);
+                return true;
+            }
+        };
+
+    }
+
     private void addEdgeAndNodes(List<Tree> result, Edge edge) {
         edges.add(edge);
         nodes.add(edge.getFromId());
@@ -216,5 +242,9 @@ public class Tree {
 
     private Edge findEdgeTo(long toId) {
         return edges.stream().filter(edge -> edge.getToId() == toId).findFirst().orElse(null);
+    }
+
+    public Set<Edge> getEdges() {
+        return edges;
     }
 }
