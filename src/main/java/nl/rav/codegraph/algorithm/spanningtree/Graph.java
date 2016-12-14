@@ -22,30 +22,29 @@ public class Graph {
     public void addEdge(Edge edge) {
 
         List<Tree> changedTrees = new ArrayList<>();
-        changedTrees.add(new Tree(edge));
+
+        Tree singleEdgeTree = new Tree(edge);
+        trees.stream().forEach(tree -> {
+            if (tree.hasCrossNode(singleEdgeTree.getRootEdge().getToId())) {
+                singleEdgeTree.getCrossEdges().add(singleEdgeTree.getRootEdge());
+            }
+        });
+
+        changedTrees.add(singleEdgeTree);
 
         while (!changedTrees.isEmpty()) {
-            Tree mergeTree = trees.stream()
-                    .filter(tree1 -> tree1.canAddTree(changedTrees.get(0)))
+            Tree headTree = changedTrees.get(0);
+            Tree firstMergeTree = trees.stream()
+                    .filter(mergeTree -> mergeTree.canMergeTree(headTree))
                     .findFirst().orElse(null);
-            if (mergeTree != null) {
-                mergeTree.addTree(changedTrees.get(0));
-                changedTrees.remove(0);
-                changedTrees.add(mergeTree);
+            if (firstMergeTree != null) {
+                List<Tree> newChangedTrees = firstMergeTree.addTree(headTree);
+                changedTrees.addAll(newChangedTrees);
+                trees.remove(headTree);
             } else {
-                Tree mergeableTree = trees.stream()
-                        .filter(tree1 -> changedTrees.get(0).canAddTree(tree1))
-                        .findFirst().orElse(null);
-                if (mergeableTree != null) {
-                    changedTrees.get(0).addTree(mergeableTree);
-                    trees.add(changedTrees.get(0));
-                    changedTrees.remove(0);
-                    trees.remove(mergeableTree);
-                } else {
-                    trees.add(changedTrees.get(0));
-                    changedTrees.remove(0);
-                }
+                trees.add(headTree);
             }
+            changedTrees.remove(0);
         }
     }
 }

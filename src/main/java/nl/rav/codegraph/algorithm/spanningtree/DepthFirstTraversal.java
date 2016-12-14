@@ -12,6 +12,12 @@ public abstract class DepthFirstTraversal {
     private Tree tree;
     private final List<Edge> analyzedEdges = new ArrayList<>();
 
+    /**
+     * visits alle edges in depth first order
+     * cross edges will be skipped
+     *
+     * @param tree
+     */
     public DepthFirstTraversal(Tree tree) {
         this.tree = tree;
         analyzedEdges.clear();

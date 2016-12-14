@@ -23,9 +23,6 @@ public class Tree {
     // a forward edge:
     private Set<Edge> forwardEdges = new HashSet<>();
 
-    // library = true: other trees have connections to the root of this tree
-    private boolean library = false;
-
     public Tree(Edge edge) {
         addEdge(edge);
     }
@@ -36,14 +33,6 @@ public class Tree {
 
     public Edge getRootEdge() {
         return rootEdge;
-    }
-
-    public boolean isLibrary() {
-        return library;
-    }
-
-    public void setLibrary(boolean library) {
-        this.library = library;
     }
 
     public boolean hasCrossEdge(Edge edge) {
@@ -105,33 +94,48 @@ public class Tree {
     }
 
     /**
-     * verifies whether tree can be added to one of the end nodes
+     * verifies whether the two trees has any matching nodes
      *
      * @param tree
      * @return
      */
-    public boolean canAddTree(Tree tree) {
-        if (tree == this) {
+    public boolean canMergeTree(Tree tree) {
+        if (this == tree) {
+            return false;
+        }
+        if (this.hasCrossNode(tree.rootEdge.getFromId()) || tree.hasCrossNode(this.rootEdge.getFromId())) {
             return false;
         }
 
-        if (!tree.isLibrary() && this.containsNode(tree.rootEdge.getFromId())) {
-            return true;
-        }
-
-        return false;
+        return nodes.stream().anyMatch(
+                nodeId -> tree.containsNode(nodeId) && !this.hasCrossNode(nodeId) && !tree.hasCrossNode(nodeId)
+        );
     }
 
-    public void addTree(Tree tree) {
+    public boolean hasCrossNode(Long nodeId) {
+        return crossEdges.stream().anyMatch(edge -> edge.getToId() == nodeId);
+    }
+
+    public List<Tree> addTree(Tree tree) {
+        List<Tree> result = new ArrayList<>();
 
         new DepthFirstTraversal(tree) {
             @Override
             public boolean onVisitEdge(Edge edge, Edge parentEdge, List<Edge> pathEdges) {
-                addEdge(edge);
+
+                List<Tree> modified = addEdge(edge);
+
+                modified.stream().forEach(tree1 -> {
+                    if (!result.contains(tree1)) {
+                        result.add(tree1);
+                    }
+                });
+
                 return true;
             }
         };
 
+        return result;
     }
 
     private void addEdgeAndNodes(List<Tree> result, Edge edge) {
@@ -221,11 +225,13 @@ public class Tree {
             // 1. add the new edge as a new tree
             makeNewTree(result, edge);
             // 2. add the library tree
-            result.add(splitTree(edge.getToId()));
+            Tree libTree = splitTree(edge.getToId());
+            if (libTree.edgeSize() > 0) {
+                result.add(libTree);
+            }
 
             result.get(0).crossEdges.add(result.get(0).findEdgeTo(edge.getToId()));
             result.get(1).crossEdges.add(edge);
-            result.get(2).setLibrary(true);
         }
     }
 
@@ -257,5 +263,9 @@ public class Tree {
 
     public Set<Edge> getEdges() {
         return edges;
+    }
+
+    public Set<Edge> getCrossEdges() {
+        return crossEdges;
     }
 }

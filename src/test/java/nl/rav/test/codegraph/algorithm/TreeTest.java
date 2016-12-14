@@ -125,6 +125,71 @@ public class TreeTest {
     @Test
     public void testNewLibraryTree() {
 
+        Edge edge1 = new Edge(1, 4);
+        Edge edge2 = new Edge(2, 4);
+
+        Tree tree = new Tree();
+        assertThat(tree.addEdge(edge1).get(0), is(tree));
+        List<Tree> treeList = tree.addEdge(edge2);
+
+        assertThat(treeList.size(), is(2));
+
+        // tree (original)
+        assertThat(treeList.get(0), is(tree));
+        assertThat(tree.getRootEdge(), is(edge1));
+
+        assertThat(tree.edgeSize(), is(1));
+        assertTrue(tree.containsEdge(edge1));
+
+        // new tree (containing the added edge)
+        Tree newTree = treeList.get(1);
+        assertThat(newTree.getRootEdge(), is(edge2));
+
+        assertThat(newTree.edgeSize(), is(1));
+        assertTrue(newTree.containsEdge(edge2));
+
+        // verify presence of cross edges
+        assertTrue(tree.hasCrossEdge(edge1));
+        assertTrue(newTree.hasCrossEdge(edge2));
+    }
+
+
+    @Test
+    public void testNewLibraryTreeThreeNodes() {
+
+        Edge edge1 = new Edge(1, 4);
+        Edge edge2 = new Edge(2, 4);
+        Edge edge3 = new Edge(3, 4);
+
+        Tree tree = new Tree();
+        assertThat(tree.addEdge(edge1).get(0), is(tree));
+        assertThat(tree.addEdge(edge2).get(0), is(tree));
+        List<Tree> treeList = tree.addEdge(edge3);
+
+        assertThat(treeList.size(), is(2));
+
+        // tree (original)
+        assertThat(treeList.get(0), is(tree));
+        assertThat(tree.getRootEdge(), is(edge1));
+
+        assertThat(tree.edgeSize(), is(1));
+        assertTrue(tree.containsEdge(edge1));
+
+        // new tree (containing the added edge)
+        Tree newTree = treeList.get(1);
+        assertThat(newTree.getRootEdge(), is(edge3));
+
+        assertThat(newTree.edgeSize(), is(1));
+        assertTrue(newTree.containsEdge(edge3));
+
+        // verify presence of cross edges
+        assertTrue(tree.hasCrossEdge(edge1));
+        assertTrue(newTree.hasCrossEdge(edge3));
+    }
+
+    @Test
+    public void testNewLibraryTree2() {
+
         Edge edge1 = new Edge(1, 3);
         Edge edge2 = new Edge(3, 4);
         Edge edge3 = new Edge(2, 3);
@@ -148,7 +213,6 @@ public class TreeTest {
 
         // new tree (containing the added edge)
         Tree newTree = treeList.get(1);
-        assertFalse(newTree.isLibrary());
         assertThat(newTree.getRootEdge(), is(edge3));
 
         assertThat(newTree.edgeSize(), is(1));
@@ -161,7 +225,6 @@ public class TreeTest {
 
         // new tree (the library)
         Tree libTree = treeList.get(2);
-        assertTrue(libTree.isLibrary());
         assertThat(libTree.getRootEdge(), is(edge2));
 
         assertThat(libTree.edgeSize(), is(1));
@@ -265,7 +328,7 @@ public class TreeTest {
         tree2.addEdge(edge5);
         tree2.addEdge(edge6);
 
-        assertTrue(tree1.canAddTree(tree2));
+        assertTrue(tree1.canMergeTree(tree2));
         tree1.addTree(tree2);
 
         assertTrue(tree1.containsEdge(edge1));
@@ -297,7 +360,7 @@ public class TreeTest {
         tree2.addEdge(edge5);
         tree2.addEdge(edge6);
 
-        assertTrue(tree1.canAddTree(tree2));
+        assertTrue(tree1.canMergeTree(tree2));
         tree1.addTree(tree2);
 
         assertTrue(tree1.containsEdge(edge1));
@@ -330,7 +393,7 @@ public class TreeTest {
         tree2.addEdge(edge5);
         tree2.addEdge(edge6);
 
-        assertTrue(tree1.canAddTree(tree2));
+        assertTrue(tree1.canMergeTree(tree2));
         tree1.addTree(tree2);
 
         assertTrue(tree1.containsEdge(edge1));
@@ -339,6 +402,43 @@ public class TreeTest {
         assertTrue(tree1.containsEdge(edge4));
         assertTrue(tree1.hasCycleEdge(edge5));
         assertTrue(tree1.containsEdge(edge6));
+    }
+
+    @Test
+    public void testAddTreeWithLibrary() {
+
+        Edge edge1 = new Edge(1, 2);
+        Edge edge2 = new Edge(2, 3);
+        Edge edge3 = new Edge(3, 4);
+        Edge edge4 = new Edge(4, 5);
+
+        Edge edge5 = new Edge(6, 7);
+        Edge edge6 = new Edge(7, 4);
+
+        Tree tree1 = new Tree();
+        tree1.addEdge(edge1);
+        tree1.addEdge(edge2);
+        tree1.addEdge(edge3);
+        tree1.addEdge(edge4);
+
+        Tree tree2 = new Tree();
+        tree2.addEdge(edge5);
+        tree2.addEdge(edge6);
+
+        assertTrue(tree1.canMergeTree(tree2));
+        List<Tree> trees = tree1.addTree(tree2);
+
+        assertTrue(trees.get(0).containsEdge(edge5));
+
+        assertTrue(trees.get(1).containsEdge(edge1));
+        assertTrue(trees.get(1).containsEdge(edge2));
+        assertTrue(trees.get(1).containsEdge(edge3));
+        assertTrue(trees.get(1).hasCrossEdge(edge3));
+
+        assertTrue(trees.get(2).containsEdge(edge6));
+        assertTrue(trees.get(2).hasCrossEdge(edge6));
+
+        assertTrue(trees.get(3).containsEdge(edge4));
     }
 
 }
