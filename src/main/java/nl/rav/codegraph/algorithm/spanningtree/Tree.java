@@ -1,8 +1,6 @@
 package nl.rav.codegraph.algorithm.spanningtree;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -12,31 +10,29 @@ import java.util.stream.Collectors;
  */
 public class Tree {
 
-    private Long rootNode;
+    private long rootNode;
     private Set<Edge> edges = new HashSet<>();
     private Set<Long> nodes = new HashSet<>();
 
-    // cross edges are edges that connect this tree to the roots of other trees
-    private Set<Edge> crossEdges = new HashSet<>();
     // a cycle edge: an edge that causes a cycle within this tree
     private Set<Edge> cycleEdges = new HashSet<>();
     // a forward edge:
     private Set<Edge> forwardEdges = new HashSet<>();
 
     public Tree(Edge edge) {
-        addEdge(edge);
+        this.rootNode = edge.getFromId();
+        edges.add(edge);
+        nodes.add(edge.getFromId());
+        nodes.add(edge.getToId());
     }
 
-    public Tree() {
-        //do nothing
+    public Tree(long rootNode) {
+        this.rootNode = rootNode;
+        nodes.add(rootNode);
     }
 
     public Long getRootNode() {
         return rootNode;
-    }
-
-    public boolean hasCrossEdge(Edge edge) {
-        return crossEdges.contains(edge);
     }
 
     public boolean hasCycleEdge(Edge edge) {
@@ -63,183 +59,151 @@ public class Tree {
         return edges.size();
     }
 
+    public Set<Edge> getEdges() {
+        return edges;
+    }
+
     /**
      * add an edge to this tree object
      *
      * @param edge
-     * @return list containing this tree (if modified) and if applicable the new trees (due to adding the edge)
      */
-    public List<Tree> addEdge(Edge edge) {
-        List<Tree> result = new ArrayList<>();
+    public void addEdge(Edge edge) {
+        if (isIndependentEdge(edge) || hasCommonDestination(edge)) {
+            throw new IllegalStateException("Cannot add edge: " + edge);
+        }
 
-        if (isDuplicate(edge)) {
-            //do nothing
-        } else if (isRootEdge(edge)) {
-            //new root
+        if (rootNode == edge.getToId()) {
             rootNode = edge.getFromId();
-            addEdgeAndNodes(result, edge);
-        } else if (isCycleMakingEdge(edge)) {
-            makeCycle(result, edge);
+        }
+
+        if (isCycleMakingEdge(edge)) {
+            cycleEdges.add(edge);
         } else if (isForwardMakingEdge(edge)) {
-            makeForward(result, edge);
-        } else if (isLibraryMakingEdge(edge)) {
-            makeLibrary(result, edge);
-        } else if (isIsolatedEdge(edge)) {
-            makeNewTree(result, edge);
+            makeForward(edge);
         } else {
-            addEdgeAndNodes(result, edge);
+            edges.add(edge);
+            nodes.add(edge.getFromId());
+            nodes.add(edge.getToId());
         }
 
-        return result;
     }
 
-    /**
-     * verifies whether the two trees has any matching nodes
-     *
-     * @param tree
-     * @return
-     */
-    public boolean canMergeTree(Tree tree) {
-        if (this == tree) {
-            return false;
-        }
-        if (this.hasCrossNode(tree.rootNode) || tree.hasCrossNode(this.rootNode)) {
-            return false;
-        }
-
-        return nodes.stream().anyMatch(
-                nodeId -> tree.containsNode(nodeId) && !this.hasCrossNode(nodeId) && !tree.hasCrossNode(nodeId)
-        );
-    }
-
-    public boolean hasCrossNode(Long nodeId) {
-        return crossEdges.stream().anyMatch(edge -> edge.getToId() == nodeId);
-    }
-
-    public List<Tree> addTree(Tree tree) {
-        List<Tree> result = new ArrayList<>();
-
-        new DepthFirstTraversal(tree) {
-            @Override
-            public boolean onVisitEdge(Edge edge) {
-
-                List<Tree> modified = addEdge(edge);
-
-                modified.stream().forEach(tree1 -> {
-                    if (!result.contains(tree1)) {
-                        result.add(tree1);
-                    }
-                });
-
-                return true;
-            }
-        };
-
-        return result;
-    }
-
-    private void addEdgeAndNodes(List<Tree> result, Edge edge) {
-        edges.add(edge);
-        nodes.add(edge.getFromId());
-        nodes.add(edge.getToId());
-        result.add(this);
-    }
-
-    private boolean isDuplicate(Edge edge) {
-        return edges.contains(edge);
-    }
-
-    private boolean isRootEdge(Edge edge) {
-        return (rootNode == null) || ((edge.getToId() == rootNode) && (!nodes.contains(edge.getFromId())));
-    }
-
-    private boolean isIsolatedEdge(Edge edge) {
-        return !nodes.contains(edge.getFromId()) && !nodes.contains(edge.getToId());
-    }
-
-    private void makeNewTree(List<Tree> result, Edge edge) {
-        Tree tree = new Tree(edge);
-        result.add(tree);
-    }
-
-    private boolean isCycleMakingEdge(Edge edge) {
-        if (nodes.contains(edge.getToId()) && nodes.contains(edge.getFromId())) {
-            Edge edgeTo = edge;
-            while (true) {
-                edgeTo = findEdgeTo(edgeTo.getFromId());
-                if (edgeTo == null) {
-                    return false;
-                }
-                if (edgeTo.getFromId() == edge.getToId()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private void makeCycle(List<Tree> result, Edge edge) {
-        result.add(this);
-        cycleEdges.add(edge);
-    }
-
-    private boolean isForwardMakingEdge(Edge edge) {
-        if (nodes.contains(edge.getToId()) && nodes.contains(edge.getFromId())) {
-            Edge edgeTo = new Edge(edge.getToId(), edge.getFromId());
-            while (true) {
-                edgeTo = findEdgeTo(edgeTo.getFromId());
-                if (edgeTo == null) {
-                    break;
-                }
-                if (edgeTo.getFromId() == edge.getFromId()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private void makeForward(List<Tree> result, Edge edge) {
-        result.add(this);
-        forwardEdges.add(edge);
-    }
-
-    private boolean isLibraryMakingEdge(Edge edge) {
-        return nodes.contains(edge.getToId()) && (rootNode != edge.getToId());
-    }
-
-    private void makeLibrary(List<Tree> result, Edge edge) {
-
-        if (nodes.contains(edge.getFromId())) {
-            // it is internal
-            Edge forwardEdge = findEdgeTo(edge.getToId());
-            forwardEdges.add(forwardEdge);
-            edges.remove(forwardEdge);
-            addEdgeAndNodes(result, edge);
-        } else {
-            // it is to another library tree
-
-            // 0. add the existing tree
-            result.add(this);
-            // 1. add the new edge as a new tree
-            makeNewTree(result, edge);
-            // 2. add the library tree
-            Tree libTree = splitTree(edge.getToId());
-            if (libTree.edgeSize() > 0) {
-                result.add(libTree);
-            }
-
-            result.get(0).crossEdges.add(result.get(0).findEdgeTo(edge.getToId()));
-            result.get(1).crossEdges.add(edge);
-        }
-    }
-
-    private Tree splitTree(long id) {
-        Tree tree = new Tree();
+    public Tree splitTree(long id) {
+        Tree tree = new Tree(id);
         transferEdges(tree, id);
         //add removed root-node, as it is still a destination node
         nodes.add(id);
         return tree;
+    }
+
+    public boolean isDuplicate(Edge edge) {
+        return edges.contains(edge);
+    }
+
+    public boolean isIndependentEdge(Edge edge) {
+        return !nodes.contains(edge.getFromId()) && !nodes.contains(edge.getToId());
+    }
+
+    public boolean hasCommonDestination(Edge edge) {
+        return nodes.contains(
+                edge.getToId())
+                && (rootNode != edge.getToId())
+                && !isCycleMakingEdge(edge)
+                && !isForwardMakingEdge(edge)
+                && !isDuplicate(edge);
+    }
+
+    private boolean containsBothNodes(Edge edge) {
+        return nodes.contains(edge.getToId()) && nodes.contains(edge.getFromId());
+    }
+
+    private boolean isCycleMakingEdge(Edge edge) {
+        if (containsBothNodes(edge)) {
+            long fromNode = edge.getFromId();
+            while (true) {
+                Edge parent = findEdgeTo(fromNode);
+                if (parent == null) {
+                    return false;
+                }
+                if (parent.getFromId() == edge.getToId()) {
+                    return true;
+                }
+                fromNode = parent.getFromId();
+            }
+        }
+        return false;
+    }
+
+    private boolean isForwardMakingEdge(Edge edge) {
+        if (containsBothNodes(edge)) {
+
+            // A -> B -> C  A -> C  (edge = A -> C)
+            long fromNode = edge.getToId();
+            while (true) {
+                Edge parent = findEdgeTo(fromNode);
+                if (parent == null) {
+                    break;
+                }
+                if (parent.getFromId() == edge.getFromId()) {
+                    return true;
+                }
+
+                fromNode = parent.getFromId();
+            }
+
+            // A -> B -> C  A -> C  (edge = B -> C)
+            Edge candidate = findEdgeTo(edge.getToId());
+            if (candidate != null) {
+                fromNode = edge.getFromId();
+                while (true) {
+                    Edge parent = findEdgeTo(fromNode);
+                    if (parent == null) {
+                        break;
+                    }
+                    if (parent.getFromId() == candidate.getFromId()) {
+                        return true;
+                    }
+
+                    fromNode = parent.getFromId();
+                }
+            }
+        }
+        return false;
+    }
+
+    private void makeForward(Edge edge) {
+        // A -> B -> C  A -> C  (edge = A -> C)
+        long fromNode = edge.getToId();
+        while (true) {
+            Edge parent = findEdgeTo(fromNode);
+            if (parent == null) {
+                break;
+            }
+            if (parent.getFromId() == edge.getFromId()) {
+                forwardEdges.add(edge);
+                return;
+            }
+            fromNode = parent.getFromId();
+        }
+
+        // A -> B -> C  A -> C  (edge = B -> C)
+        Edge candidate = findEdgeTo(edge.getToId());
+        if (candidate != null) {
+            fromNode = edge.getFromId();
+            while (true) {
+                Edge parent = findEdgeTo(fromNode);
+                if (parent == null) {
+                    break;
+                }
+                if (parent.getFromId() == candidate.getFromId()) {
+                    forwardEdges.add(candidate);
+                    edges.add(edge);
+                    edges.remove(candidate);
+                }
+                fromNode = parent.getFromId();
+            }
+        }
     }
 
     private void transferEdges(Tree tree, long fromId) {
@@ -260,11 +224,10 @@ public class Tree {
         return edges.stream().filter(edge -> edge.getToId() == toId).findFirst().orElse(null);
     }
 
-    public Set<Edge> getEdges() {
-        return edges;
-    }
-
-    public Set<Edge> getCrossEdges() {
-        return crossEdges;
+    public void merge(Tree tailTree) {
+        this.edges.addAll(tailTree.edges);
+        this.nodes.addAll(tailTree.nodes);
+        this.cycleEdges.addAll(tailTree.cycleEdges);
+        this.forwardEdges.addAll(tailTree.forwardEdges);
     }
 }

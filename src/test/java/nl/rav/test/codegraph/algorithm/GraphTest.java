@@ -100,16 +100,15 @@ public class GraphTest {
         graph.addEdge(edge3);
 
         assertThat(graph.getSortedTrees().size(), is(3));
+        assertTrue(graph.hasCrossNode(edge3.getFromId()));
 
         Tree tree1 = graph.getSortedTrees().get(0);
         assertThat(tree1.edgeSize(), is(1));
         assertTrue(tree1.containsEdge(edge1));
-        assertTrue(tree1.hasCrossEdge(edge1));
 
         Tree tree2 = graph.getSortedTrees().get(1);
         assertThat(tree2.edgeSize(), is(1));
         assertTrue(tree2.containsEdge(edge2));
-        assertTrue(tree2.hasCrossEdge(edge2));
 
         Tree tree3 = graph.getSortedTrees().get(2);
         assertThat(tree3.edgeSize(), is(1));
@@ -129,22 +128,25 @@ public class GraphTest {
         graph.addEdge(edge2);
         graph.addEdge(edge3);
 
-        assertThat(graph.getSortedTrees().size(), is(3));
+        assertThat(graph.getSortedTrees().size(), is(4));
+        assertTrue(graph.hasCrossNode(4));
 
         Tree tree1 = graph.getSortedTrees().get(0);
         assertThat(tree1.edgeSize(), is(1));
         assertTrue(tree1.containsEdge(edge1));
-        assertTrue(tree1.hasCrossEdge(edge1));
 
         Tree tree2 = graph.getSortedTrees().get(1);
         assertThat(tree2.edgeSize(), is(1));
         assertTrue(tree2.containsEdge(edge2));
-        assertTrue(tree2.hasCrossEdge(edge2));
 
         Tree tree3 = graph.getSortedTrees().get(2);
         assertThat(tree3.edgeSize(), is(1));
         assertTrue(tree3.containsEdge(edge3));
-        assertTrue(tree3.hasCrossEdge(edge3));
+
+
+        Tree tree4 = graph.getSortedTrees().get(3);
+        assertThat(tree4.edgeSize(), is(0));
+        assertThat(tree4.getRootNode(), is(4L));
     }
 
     @Test
@@ -166,28 +168,22 @@ public class GraphTest {
         graph.addEdge(edge1);
         graph.addEdge(edge2);
         graph.addEdge(edge3);
-        //TODO implement support for multiple libs
-        // does not merge edge4 now
         graph.addEdge(edge4);
         graph.addEdge(edge5);
         graph.addEdge(edge6);
 
         assertThat(graph.getSortedTrees().size(), is(5));
+        assertTrue(graph.hasCrossNode(4));
+        assertTrue(graph.hasCrossNode(5));
 
         Tree tree1 = graph.getSortedTrees().get(0);
         assertThat(tree1.edgeSize(), is(2));
-        assertTrue(tree1.hasCrossEdge(edge1));
-        assertTrue(tree1.hasCrossEdge(edge4));
 
         Tree tree2 = graph.getSortedTrees().get(1);
         assertThat(tree2.edgeSize(), is(2));
-        assertTrue(tree2.hasCrossEdge(edge2));
-        assertTrue(tree2.hasCrossEdge(edge5));
 
         Tree tree3 = graph.getSortedTrees().get(2);
         assertThat(tree3.edgeSize(), is(2));
-        assertTrue(tree3.hasCrossEdge(edge3));
-        assertTrue(tree3.hasCrossEdge(edge6));
 
         Tree libTree1 = graph.getSortedTrees().get(3);
         assertThat(libTree1.edgeSize(), is(1));

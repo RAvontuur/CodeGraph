@@ -1,6 +1,5 @@
 package nl.rav.codegraph.algorithm.spanningtree;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +11,7 @@ import java.util.stream.Collectors;
 public class Graph {
 
     private Set<Tree> trees = new HashSet<>();
+    private Set<Long> crossNodes = new HashSet<>();
 
     public List<Tree> getSortedTrees() {
         return trees.stream()
@@ -20,31 +20,62 @@ public class Graph {
     }
 
     public void addEdge(Edge edge) {
+        Set<Tree> relevantTrees = trees.stream()
+                .filter(tree1 -> !tree1.isIndependentEdge(edge))
+                .collect(Collectors.toSet());
 
-        List<Tree> changedTrees = new ArrayList<>();
-
-        Tree singleEdgeTree = new Tree(edge);
-        trees.stream().forEach(tree -> {
-            if (tree.hasCrossNode(edge.getToId())) {
-                singleEdgeTree.getCrossEdges().add(edge);
-            }
-        });
-
-        changedTrees.add(singleEdgeTree);
-
-        while (!changedTrees.isEmpty()) {
-            Tree headTree = changedTrees.get(0);
-            Tree firstMergeTree = trees.stream()
-                    .filter(mergeTree -> mergeTree.canMergeTree(headTree))
+        if (relevantTrees.isEmpty()) {
+            trees.add(new Tree(edge));
+        } else if (crossNodes.contains(edge.getFromId())) {
+            Tree libTree = relevantTrees.stream()
+                    .filter(tree -> tree.getRootNode() == edge.getFromId())
+                    .findFirst().orElseThrow(() -> new IllegalStateException("libTree expected"));
+            libTree.addEdge(edge);
+        } else if (crossNodes.contains(edge.getToId())) {
+            Tree existingTree = relevantTrees.stream()
+                    .filter(tree -> tree.containsNode(edge.getFromId()))
                     .findFirst().orElse(null);
-            if (firstMergeTree != null) {
-                List<Tree> newChangedTrees = firstMergeTree.addTree(headTree);
-                changedTrees.addAll(newChangedTrees);
-                trees.remove(headTree);
+            if (existingTree != null) {
+                existingTree.addEdge(edge);
             } else {
-                trees.add(headTree);
+                trees.add(new Tree(edge));
             }
-            changedTrees.remove(0);
+        } else {
+            Tree commonTree = relevantTrees.stream()
+                    .filter(tree -> tree.hasCommonDestination(edge))
+                    .findFirst().orElse(null);
+            if (commonTree != null) {
+                crossNodes.add(edge.getToId());
+                Tree existingTree = relevantTrees.stream()
+                        .filter(tree -> tree.containsNode(edge.getFromId()))
+                        .findFirst().orElse(null);
+                if (existingTree != null) {
+                    existingTree.addEdge(edge);
+                } else {
+                    trees.add(new Tree(edge));
+                }
+                Tree libTree = commonTree.splitTree(edge.getToId());
+                trees.add(libTree);
+            } else if (relevantTrees.size() == 1) {
+                relevantTrees.iterator().next().addEdge(edge);
+            } else if (relevantTrees.size() == 2) {
+                Tree headTree = relevantTrees.stream()
+                        .filter(tree -> tree.getRootNode() == edge.getToId())
+                        .findFirst().orElseThrow(() -> new IllegalStateException("headTree expected"));
+                Tree tailTree = relevantTrees.stream()
+                        .filter(tree -> tree.getRootNode() != edge.getToId())
+                        .findFirst().orElseThrow(() -> new IllegalStateException("tailTree expected"));
+                headTree.addEdge(edge);
+                headTree.merge(tailTree);
+                trees.remove(tailTree);
+            } else {
+                throw new IllegalStateException("only one headTree and one tailTree expected");
+            }
         }
+    }
+
+
+    public boolean hasCrossNode(long id) {
+        return crossNodes.contains(id);
     }
 }
