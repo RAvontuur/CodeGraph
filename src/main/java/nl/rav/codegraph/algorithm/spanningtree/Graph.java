@@ -71,8 +71,14 @@ public class Graph {
             } else {
                 trees.add(new Tree(edge));
             }
+            Set<Edge> cycleEdges = commonTree.extractCycleEdges();
+            Set<Edge> forwardEdges = commonTree.extractForwardEdges();
+
             Tree libTree = commonTree.splitTree(edge.getToId());
             trees.add(libTree);
+
+            addEdges(cycleEdges);
+            addEdges(forwardEdges);
             return;
         }
 
@@ -99,6 +105,11 @@ public class Graph {
         throw new IllegalStateException("No handler for edge found: " + edge);
     }
 
+    private void addEdges(Iterable<Edge> edges) {
+        edges.spliterator().forEachRemaining(edge -> {
+            addEdge(edge);
+        });
+    }
 
     public boolean hasCrossNode(long id) {
         return crossNodes.contains(id);

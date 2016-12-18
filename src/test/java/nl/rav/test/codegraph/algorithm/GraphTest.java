@@ -350,4 +350,41 @@ public class GraphTest {
     }
 
 
+    @Test
+    public void TestForwardToLibrary2() {
+
+        Graph graph = new Graph();
+
+        Edge edge1 = new Edge(1, 3);
+        Edge edge2 = new Edge(2, 3);
+        Edge edge3 = new Edge(3, 4);
+        Edge edge4 = new Edge(4, 5);
+        Edge edge5 = new Edge(3, 5);
+
+        graph.addEdge(edge1);
+        graph.addEdge(edge3);
+        graph.addEdge(edge4);
+        graph.addEdge(edge5);
+        // make the library to an existing cycle
+        graph.addEdge(edge2);
+
+        assertThat(graph.getSortedTrees().size(), is(3));
+        assertTrue(graph.hasCrossNode(3));
+
+        Tree tree1 = graph.getSortedTrees().get(0);
+        assertThat(tree1.edgeSize(), is(1));
+        assertTrue(tree1.containsEdge(edge1));
+
+        Tree tree2 = graph.getSortedTrees().get(1);
+        assertThat(tree2.edgeSize(), is(1));
+        assertTrue(tree2.containsEdge(edge2));
+
+        Tree tree3 = graph.getSortedTrees().get(2);
+        assertThat(tree3.edgeSize(), is(2));
+        assertTrue(tree3.containsEdge(edge3));
+        assertTrue(tree3.containsEdge(edge4));
+        assertTrue(tree3.hasForwardEdge(edge5));
+    }
+
+
 }

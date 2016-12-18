@@ -89,6 +89,24 @@ public class Tree {
 
     }
 
+    public Set<Edge> extractCycleEdges() {
+        Set<Edge> result = new HashSet<>();
+        result.addAll(cycleEdges);
+
+        cycleEdges.clear();
+
+        return result;
+    }
+
+    public Set<Edge> extractForwardEdges() {
+        Set<Edge> result = new HashSet<>();
+        result.addAll(forwardEdges);
+
+        forwardEdges.clear();
+
+        return result;
+    }
+
     public Tree splitTree(long id) {
         if (!forwardEdges.isEmpty() || !cycleEdges.isEmpty()) {
             throw new IllegalStateException("do not call splitTree when tree has forwards or cycles");
