@@ -19,6 +19,10 @@ public class Tree {
     private Set<Edge> forwardEdges = new HashSet<>();
 
     public Tree(Edge edge) {
+        if (edge.getFromId() == edge.getToId()) {
+            throw new IllegalStateException("Cannot add edge: " + edge);
+        }
+
         this.rootNode = edge.getFromId();
         edges.add(edge);
     }
@@ -71,7 +75,7 @@ public class Tree {
      * @param edge
      */
     public void addEdge(Edge edge) {
-        if (isIndependentEdge(edge) || hasCommonDestination(edge)) {
+        if ((edge.getFromId() == edge.getToId()) || isIndependentEdge(edge) || hasCommonDestination(edge)) {
             throw new IllegalStateException("Cannot add edge: " + edge);
         }
 

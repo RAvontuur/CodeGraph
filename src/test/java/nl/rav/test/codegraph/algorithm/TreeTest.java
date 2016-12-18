@@ -21,6 +21,17 @@ public class TreeTest {
         assertThat(tree.nodeSize(), is(1));
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testInvalidEdge() {
+        new Tree(new Edge(1, 1));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testInvalidEdge2() {
+        Tree tree = new Tree(1L);
+        tree.addEdge(new Edge(1, 1));
+    }
+
     @Test
     public void testSimple() {
 
