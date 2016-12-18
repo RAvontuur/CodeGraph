@@ -1,56 +1,55 @@
 package nl.rav.codegraph.controller.drawing.domain;
 
+import nl.rav.codegraph.algorithm.spanningtree.DepthFirstTraversal;
 import nl.rav.codegraph.algorithm.spanningtree.Edge;
-import nl.rav.codegraph.algorithm.spanningtree.RootDetector;
-import nl.rav.codegraph.domain.Graph;
+import nl.rav.codegraph.algorithm.spanningtree.Graph;
+import nl.rav.codegraph.algorithm.spanningtree.Tree;
 import nl.rav.codegraph.domain.JavaPackage;
+import nl.rav.codegraph.domain.PackageMap;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import static nl.rav.codegraph.algorithm.spanningtree.EdgeType.TREE;
 
 /**
  * Created by rene on 4-12-16.
  */
 public class GraphConverter {
 
-    public Drawing createDrawing(Graph graph) {
+    public Drawing createDrawing(Graph graph, PackageMap packageMap) {
         Drawing drawing = new Drawing();
+        LevelMap levelMap = new LevelMap();
 
-        RectanglesBrowser rectanglesBrowser = new RectanglesBrowser(graph, drawing);
-
-        //add all packages with dependencies
-        rectanglesBrowser.traverseAllDepthFirst(rectanglesBrowser.findRootEdges());
+        graph.getSortedTrees().stream().forEach(tree -> {
+            addTree(drawing, tree, packageMap, levelMap);
+        });
 
         //add packages without dependendies
-        graph.allJavaPackages().stream().forEach(javaPackage -> {
+        packageMap.allJavaPackages().stream().forEach(javaPackage -> {
             Rectangle fromRectangle = drawing.getRectangles().get(javaPackage.getName());
             if (fromRectangle == null) {
                 int y1 = 0;
-                int x1 = rectanglesBrowser.addToLevel(y1);
+                int x1 = levelMap.addToLevel(y1);
                 drawing.addRectangle(javaPackage.getName(), x1, y1);
             }
         });
 
-        ArrowsBrowser arrowsBrowser = new ArrowsBrowser(graph, drawing);
-        arrowsBrowser.drawArrows();
+        graph.getSortedTrees().stream().forEach(tree -> {
+            ArrowsBrowser arrowsBrowser = new ArrowsBrowser(tree, packageMap, drawing);
+            arrowsBrowser.drawArrows();
+        });
 
         return drawing;
     }
 
-    class RectanglesBrowser extends RootDetector {
-        private final Graph graph;
-        private final Drawing drawing;
+    public void addTree(Drawing drawing, Tree tree, PackageMap packageMap, LevelMap levelMap) {
 
+        //add all packages with dependencies
+        RectanglesBrowser rectanglesBrowser = new RectanglesBrowser(tree, packageMap, drawing, levelMap);
+        rectanglesBrowser.traverse();
+    }
+
+    class LevelMap {
         private final Map<Integer, Integer> levelMap = new HashMap<>();
-
-        public RectanglesBrowser(Graph graph, Drawing drawing) {
-            super(graph.getEdges());
-            this.graph = graph;
-            this.drawing = drawing;
-        }
 
         private int addToLevel(int level) {
             Integer result = levelMap.get(level);
@@ -63,26 +62,37 @@ public class GraphConverter {
             return result;
         }
 
+    }
+
+    class RectanglesBrowser extends DepthFirstTraversal {
+        private final PackageMap packageMap;
+        private final Drawing drawing;
+        private final LevelMap levelMap;
+
+        public RectanglesBrowser(Tree tree, PackageMap packageMap, Drawing drawing, LevelMap levelMap) {
+            super(tree);
+            this.packageMap = packageMap;
+            this.drawing = drawing;
+            this.levelMap = levelMap;
+        }
+
+
         @Override
-        protected boolean onVisitEdge(Edge edge, Edge parentEdge, List<Edge> pathEdges) {
+        public boolean onVisitEdge(Edge edge, int depth) {
 
-            if (edge.getEdgeType() != TREE) {
-                return false;
-            }
-
-            JavaPackage from = graph.getJavaPackage(edge.getFromId());
+            JavaPackage from = packageMap.getJavaPackage(edge.getFromId());
             Rectangle fromRectangle = drawing.getRectangles().get(from.getName());
             if (fromRectangle == null) {
-                int y1 = pathEdges.size();
-                int x1 = addToLevel(y1);
+                int y1 = depth;
+                int x1 = levelMap.addToLevel(y1);
                 drawing.addRectangle(from.getName(), x1, y1);
             }
 
-            JavaPackage to = graph.getJavaPackage(edge.getToId());
+            JavaPackage to = packageMap.getJavaPackage(edge.getToId());
             Rectangle toRectangle = drawing.getRectangles().get(to.getName());
             if (toRectangle == null) {
-                int y2 = pathEdges.size() + 1;
-                int x2 = addToLevel(y2);
+                int y2 = depth + 1;
+                int x2 = levelMap.addToLevel(y2);
                 drawing.addRectangle(to.getName(), x2, y2);
             }
 
@@ -91,31 +101,36 @@ public class GraphConverter {
     }
 
     class ArrowsBrowser {
-        private final Graph graph;
+        private final Tree tree;
+        private final PackageMap packageMap;
         private final Drawing drawing;
 
-        public ArrowsBrowser(Graph graph, Drawing drawing) {
-            this.graph = graph;
+        public ArrowsBrowser(Tree tree, PackageMap packageMap, Drawing drawing) {
+            this.tree = tree;
+            this.packageMap = packageMap;
             this.drawing = drawing;
         }
 
 
         public void drawArrows() {
-            graph.getEdges().stream()
-                    .forEach(edge -> drawEdge(edge));
-
+            tree.getEdges().stream()
+                    .forEach(edge -> drawEdge(edge, "tree"));
+            tree.getCycleEdges().stream()
+                    .forEach(edge -> drawEdge(edge, "back"));
+            tree.getForwardEdges().stream()
+                    .forEach(edge -> drawEdge(edge, "forward"));
         }
 
-        private void drawEdge(Edge edge) {
-            JavaPackage from = graph.getJavaPackage(edge.getFromId());
+        private void drawEdge(Edge edge, String edgeType) {
+            JavaPackage from = packageMap.getJavaPackage(edge.getFromId());
             Rectangle fromRectangle = drawing.getRectangles().get(from.getName());
-            JavaPackage to = graph.getJavaPackage(edge.getToId());
+            JavaPackage to = packageMap.getJavaPackage(edge.getToId());
             Rectangle toRectangle = drawing.getRectangles().get(to.getName());
 
             drawing.addArrow(
                     fromRectangle.getX(), fromRectangle.getY(),
                     toRectangle.getX(), toRectangle.getY(),
-                    edge.getEdgeType().toString()
+                    edgeType
             );
         }
     }

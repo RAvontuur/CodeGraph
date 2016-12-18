@@ -252,4 +252,12 @@ public class Tree {
         this.cycleEdges.addAll(tailTree.cycleEdges);
         this.forwardEdges.addAll(tailTree.forwardEdges);
     }
+
+    public Set<Edge> getCycleEdges() {
+        return cycleEdges;
+    }
+
+    public Set<Edge> getForwardEdges() {
+        return forwardEdges;
+    }
 }

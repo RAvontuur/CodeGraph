@@ -22,21 +22,25 @@ public abstract class DepthFirstTraversal {
         this.tree = tree;
         analyzedEdges.clear();
 
-        traverse(tree.getRootNode());
+
     }
 
-    public abstract boolean onVisitEdge(Edge edge);
+    public void traverse() {
+        traverse(tree.getRootNode(), 0);
+    }
+
+    public abstract boolean onVisitEdge(Edge edge, int depth);
 
     // depth first search
-    private void traverse(Long nodeId) {
+    private void traverse(Long nodeId, int depth) {
 
         while (true) {
             Edge nextEdge = findNextEdge(nodeId);
             if (nextEdge == null) {
                 break;
             }
-            if (onVisitEdge(nextEdge)) {
-                traverse(nextEdge.getToId());
+            if (onVisitEdge(nextEdge, depth)) {
+                traverse(nextEdge.getToId(), depth + 1);
                 analyzedEdges.add(nextEdge);
             } else {
                 break;

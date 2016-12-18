@@ -105,7 +105,7 @@ public class Graph {
         throw new IllegalStateException("No handler for edge found: " + edge);
     }
 
-    private void addEdges(Iterable<Edge> edges) {
+    public void addEdges(Iterable<Edge> edges) {
         edges.spliterator().forEachRemaining(edge -> {
             addEdge(edge);
         });

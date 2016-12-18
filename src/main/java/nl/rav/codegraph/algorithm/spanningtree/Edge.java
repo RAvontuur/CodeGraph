@@ -9,7 +9,6 @@ public class Edge {
 
     private final long fromId;
     private final long toId;
-    private EdgeType edgeType;
 
     public Edge(long fromId, long toId) {
         this.fromId = fromId;
@@ -24,20 +23,11 @@ public class Edge {
         return toId;
     }
 
-    public EdgeType getEdgeType() {
-        return edgeType;
-    }
-
-    public void setEdgeType(EdgeType edgeType) {
-        this.edgeType = edgeType;
-    }
-
     @Override
     public String toString() {
         return "Edge{" +
                 "fromId=" + fromId +
                 ", toId=" + toId +
-                ", edgeType=" + edgeType +
                 '}';
     }
 
