@@ -26,12 +26,26 @@ public class Graph {
 
         if (relevantTrees.isEmpty()) {
             trees.add(new Tree(edge));
-        } else if (crossNodes.contains(edge.getFromId())) {
+            return;
+        }
+
+        if (crossNodes.contains(edge.getFromId())) {
             Tree libTree = relevantTrees.stream()
                     .filter(tree -> tree.getRootNode() == edge.getFromId())
                     .findFirst().orElseThrow(() -> new IllegalStateException("libTree expected"));
             libTree.addEdge(edge);
-        } else if (crossNodes.contains(edge.getToId())) {
+
+            Tree commonTree = relevantTrees.stream()
+                    .filter(tree -> tree.hasCommonDestination(edge))
+                    .findFirst().orElse(null);
+            if (commonTree != null) {
+                crossNodes.add(edge.getToId());
+                trees.add(new Tree(edge.getToId()));
+            }
+            return;
+        }
+
+        if (crossNodes.contains(edge.getToId())) {
             Tree existingTree = relevantTrees.stream()
                     .filter(tree -> tree.containsNode(edge.getFromId()))
                     .findFirst().orElse(null);
@@ -40,38 +54,49 @@ public class Graph {
             } else {
                 trees.add(new Tree(edge));
             }
-        } else {
-            Tree commonTree = relevantTrees.stream()
-                    .filter(tree -> tree.hasCommonDestination(edge))
-                    .findFirst().orElse(null);
-            if (commonTree != null) {
-                crossNodes.add(edge.getToId());
-                Tree existingTree = relevantTrees.stream()
-                        .filter(tree -> tree.containsNode(edge.getFromId()))
-                        .findFirst().orElse(null);
-                if (existingTree != null) {
-                    existingTree.addEdge(edge);
-                } else {
-                    trees.add(new Tree(edge));
-                }
-                Tree libTree = commonTree.splitTree(edge.getToId());
-                trees.add(libTree);
-            } else if (relevantTrees.size() == 1) {
-                relevantTrees.iterator().next().addEdge(edge);
-            } else if (relevantTrees.size() == 2) {
-                Tree headTree = relevantTrees.stream()
-                        .filter(tree -> tree.getRootNode() == edge.getToId())
-                        .findFirst().orElseThrow(() -> new IllegalStateException("headTree expected"));
-                Tree tailTree = relevantTrees.stream()
-                        .filter(tree -> tree.getRootNode() != edge.getToId())
-                        .findFirst().orElseThrow(() -> new IllegalStateException("tailTree expected"));
-                headTree.addEdge(edge);
-                headTree.merge(tailTree);
-                trees.remove(tailTree);
-            } else {
-                throw new IllegalStateException("only one headTree and one tailTree expected");
-            }
+            return;
         }
+
+
+        Tree commonTree = relevantTrees.stream()
+                .filter(tree -> tree.hasCommonDestination(edge))
+                .findFirst().orElse(null);
+        if (commonTree != null) {
+            crossNodes.add(edge.getToId());
+            Tree existingTree = relevantTrees.stream()
+                    .filter(tree -> tree.containsNode(edge.getFromId()))
+                    .findFirst().orElse(null);
+            if (existingTree != null) {
+                existingTree.addEdge(edge);
+            } else {
+                trees.add(new Tree(edge));
+            }
+            Tree libTree = commonTree.splitTree(edge.getToId());
+            trees.add(libTree);
+            return;
+        }
+
+
+        if (relevantTrees.size() == 1) {
+            relevantTrees.iterator().next().addEdge(edge);
+            return;
+        }
+
+        if (relevantTrees.size() == 2) {
+            Tree headTree = relevantTrees.stream()
+                    .filter(tree -> tree.getRootNode() == edge.getToId())
+                    .findFirst().orElseThrow(() -> new IllegalStateException("headTree expected"));
+            Tree tailTree = relevantTrees.stream()
+                    .filter(tree -> tree.getRootNode() != edge.getToId())
+                    .findFirst().orElseThrow(() -> new IllegalStateException("tailTree expected"));
+            headTree.addEdge(edge);
+            headTree.merge(tailTree);
+            trees.remove(tailTree);
+            return;
+        }
+
+        //not handled
+        throw new IllegalStateException("No handler for edge found: " + edge);
     }
 
 
