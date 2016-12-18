@@ -14,6 +14,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class TreeTest {
 
+    @Test
+    public void testRootNodeOnly() {
+        Tree tree = new Tree(1L);
+        assertTrue(tree.containsNode(1L));
+        assertThat(tree.nodeSize(), is(1));
+    }
 
     @Test
     public void testSimple() {
@@ -173,7 +179,7 @@ public class TreeTest {
         assertThat(tree.edgeSize(), is(1));
         assertTrue(tree.containsEdge(edge1));
 
-        // new tree (no edges)
+        // new tree
         assertThat(newTree.getRootNode(), is(4L));
         assertThat(newTree.edgeSize(), is(3));
 
@@ -186,6 +192,35 @@ public class TreeTest {
         assertTrue(newTree.containsNode(6));
         assertTrue(newTree.containsNode(7));
 
+    }
+
+
+    @Test(expected = IllegalStateException.class)
+    public void testSplitTreeWithCycle() {
+
+        Edge edge1 = new Edge(1, 2);
+        Edge edge2 = new Edge(2, 3);
+        Edge edge3 = new Edge(3, 1);
+
+        Tree tree = new Tree(edge1);
+        tree.addEdge(edge2);
+        tree.addEdge(edge3);
+
+        tree.splitTree(2L);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testSplitTreeWithForward() {
+
+        Edge edge1 = new Edge(1, 2);
+        Edge edge2 = new Edge(2, 3);
+        Edge edge3 = new Edge(1, 3);
+
+        Tree tree = new Tree(edge1);
+        tree.addEdge(edge2);
+        tree.addEdge(edge3);
+
+        tree.splitTree(2L);
     }
 
     @Test

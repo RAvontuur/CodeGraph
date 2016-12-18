@@ -12,7 +12,6 @@ public class Tree {
 
     private long rootNode;
     private Set<Edge> edges = new HashSet<>();
-    private Set<Long> nodes = new HashSet<>();
 
     // a cycle edge: an edge that causes a cycle within this tree
     private Set<Edge> cycleEdges = new HashSet<>();
@@ -22,13 +21,10 @@ public class Tree {
     public Tree(Edge edge) {
         this.rootNode = edge.getFromId();
         edges.add(edge);
-        nodes.add(edge.getFromId());
-        nodes.add(edge.getToId());
     }
 
     public Tree(long rootNode) {
         this.rootNode = rootNode;
-        nodes.add(rootNode);
     }
 
     public Long getRootNode() {
@@ -43,16 +39,8 @@ public class Tree {
         return forwardEdges.contains(edge);
     }
 
-    public boolean containsNode(long id) {
-        return nodes.contains(id);
-    }
-
     public boolean containsEdge(Edge edge) {
         return edges.contains(edge);
-    }
-
-    public int nodeSize() {
-        return nodes.size();
     }
 
     public int edgeSize() {
@@ -61,6 +49,20 @@ public class Tree {
 
     public Set<Edge> getEdges() {
         return edges;
+    }
+
+    public boolean containsNode(long id) {
+        return (rootNode == id) || edges.stream().anyMatch(edge -> (edge.getFromId() == id) || (edge.getToId() == id));
+    }
+
+    public int nodeSize() {
+        Set<Long> nodes = new HashSet<>();
+        nodes.add(rootNode);
+        edges.stream().forEach(edge ->  {
+            nodes.add(edge.getFromId());
+            nodes.add(edge.getToId());
+        });
+        return nodes.size();
     }
 
     /**
@@ -83,17 +85,17 @@ public class Tree {
             makeForward(edge);
         } else {
             edges.add(edge);
-            nodes.add(edge.getFromId());
-            nodes.add(edge.getToId());
         }
 
     }
 
     public Tree splitTree(long id) {
+        if (!forwardEdges.isEmpty() || !cycleEdges.isEmpty()) {
+            throw new IllegalStateException("do not call splitTree when tree has forwards or cycles");
+        }
+
         Tree tree = new Tree(id);
         transferEdges(tree, id);
-        //add removed root-node, as it is still a destination node
-        nodes.add(id);
         return tree;
     }
 
@@ -102,11 +104,11 @@ public class Tree {
     }
 
     public boolean isIndependentEdge(Edge edge) {
-        return !nodes.contains(edge.getFromId()) && !nodes.contains(edge.getToId());
+        return !containsNode(edge.getFromId()) && !containsNode(edge.getToId());
     }
 
     public boolean hasCommonDestination(Edge edge) {
-        return nodes.contains(
+        return containsNode(
                 edge.getToId())
                 && (rootNode != edge.getToId())
                 && !isCycleMakingEdge(edge)
@@ -115,7 +117,7 @@ public class Tree {
     }
 
     private boolean containsBothNodes(Edge edge) {
-        return nodes.contains(edge.getToId()) && nodes.contains(edge.getFromId());
+        return containsNode(edge.getToId()) && containsNode(edge.getFromId());
     }
 
     private boolean isCycleMakingEdge(Edge edge) {
@@ -209,11 +211,10 @@ public class Tree {
     private void transferEdges(Tree tree, long fromId) {
         Set<Edge> edgesFound = findEdgesFrom(fromId);
         edgesFound.stream().forEach(edge -> {
-            tree.addEdge(edge);
+            tree.edges.add(edge);
             edges.remove(edge);
             transferEdges(tree, edge.getToId());
         });
-        nodes.remove(fromId);
     }
 
     private Set<Edge> findEdgesFrom(long fromId) {
@@ -226,7 +227,6 @@ public class Tree {
 
     public void merge(Tree tailTree) {
         this.edges.addAll(tailTree.edges);
-        this.nodes.addAll(tailTree.nodes);
         this.cycleEdges.addAll(tailTree.cycleEdges);
         this.forwardEdges.addAll(tailTree.forwardEdges);
     }
