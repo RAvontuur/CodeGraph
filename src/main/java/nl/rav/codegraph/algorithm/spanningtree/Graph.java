@@ -49,7 +49,7 @@ public class Graph {
             Tree existingTree = relevantTrees.stream()
                     .filter(tree -> tree.containsNode(edge.getFromId()))
                     .findFirst().orElse(null);
-            if (existingTree != null) {
+            if ((existingTree != null) && (!existingTree.hasCommonDestination(edge))) {
                 existingTree.addEdge(edge);
             } else {
                 trees.add(new Tree(edge));
@@ -66,7 +66,7 @@ public class Graph {
             Tree existingTree = relevantTrees.stream()
                     .filter(tree -> tree.containsNode(edge.getFromId()))
                     .findFirst().orElse(null);
-            if (existingTree != null) {
+            if ((existingTree != null) && (!existingTree.hasCommonDestination(edge))) {
                 existingTree.addEdge(edge);
             } else {
                 trees.add(new Tree(edge));
@@ -96,8 +96,10 @@ public class Graph {
                     .filter(tree -> tree.getRootNode() != edge.getToId())
                     .findFirst().orElseThrow(() -> new IllegalStateException("tailTree expected"));
             headTree.addEdge(edge);
-            headTree.merge(tailTree);
-            trees.remove(tailTree);
+            if (headTree.canMerge(tailTree)) {
+                headTree.merge(tailTree);
+                trees.remove(tailTree);
+            }
             return;
         }
 

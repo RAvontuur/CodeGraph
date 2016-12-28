@@ -30,8 +30,24 @@ public class PackageService {
         return convertToPackages(packageRepository.findChildren(fqn));
     }
 
-    public List<JavaPackage> findPackagesDependingOn(String fqn) {
-        return convertToPackages(packageRepository.findPackagesDependingOn(fqn));
+    public List<JavaPackage> findSisterPackagesDependingOnBrother(String fqn) {
+        return convertToPackages(packageRepository.findSistersDependingOnBrother(fqn));
+    }
+
+    public JavaPackage findParentPackageDependingOnChild(String fqn) {
+        List<PackageEntity> parents = packageRepository.findParentDependingOnChild(fqn);
+        if (parents.isEmpty()) {
+            return null;
+        }
+        if (parents.size() > 1) {
+            throw new IllegalStateException("found multiple parents for: " + fqn);
+        }
+
+        return convertToPackage(parents.get(0));
+    }
+
+    public List<JavaPackage> findChildrenDependingOnParent(String fqn) {
+        return convertToPackages(packageRepository.findChildrenDependingOnParent(fqn));
     }
 
     private List<JavaPackage> convertToPackages(List<PackageEntity> childPackageEntities) {

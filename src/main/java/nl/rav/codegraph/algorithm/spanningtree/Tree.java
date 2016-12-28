@@ -2,6 +2,7 @@ package nl.rav.codegraph.algorithm.spanningtree;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -75,12 +76,14 @@ public class Tree {
      * @param edge
      */
     public void addEdge(Edge edge) {
-        if ((edge.getFromId() == edge.getToId()) || isIndependentEdge(edge) || hasCommonDestination(edge)) {
-            throw new IllegalStateException("Cannot add edge: " + edge);
+        if (edge.getFromId() == edge.getToId()) {
+            throw new IllegalStateException("Cannot add illegal edge: " + edge);
         }
-
-        if (rootNode == edge.getToId()) {
-            rootNode = edge.getFromId();
+        if (isIndependentEdge(edge)) {
+            throw new IllegalStateException("Cannot add independent edge: " + edge + "to tree: " + this);
+        }
+        if (hasCommonDestination(edge)) {
+            throw new IllegalStateException("Cannot add edge with common destination: " + edge + "to tree: " + this);
         }
 
         if (isCycleMakingEdge(edge)) {
@@ -89,6 +92,9 @@ public class Tree {
             makeForward(edge);
         } else {
             edges.add(edge);
+            if (rootNode == edge.getToId()) {
+                rootNode = edge.getFromId();
+            }
         }
 
     }
@@ -130,8 +136,7 @@ public class Tree {
     }
 
     public boolean hasCommonDestination(Edge edge) {
-        return containsNode(
-                edge.getToId())
+        return containsNode(edge.getToId())
                 && (rootNode != edge.getToId())
                 && !isCycleMakingEdge(edge)
                 && !isForwardMakingEdge(edge)
@@ -247,10 +252,38 @@ public class Tree {
         return edges.stream().filter(edge -> edge.getToId() == toId).findFirst().orElse(null);
     }
 
+    public boolean canMerge(Tree tailTree) {
+        Tree headTree = this;
+
+        final AtomicBoolean result = new AtomicBoolean(true);
+
+        DepthFirstTraversal traversal = new DepthFirstTraversal(tailTree) {
+            @Override
+            public boolean onVisitEdge(Edge edge, int depth) {
+                if (result.get()) {
+                    result.set(!headTree.hasCommonDestination(edge));
+                }
+                return result.get();
+            }
+        };
+
+        traversal.traverse();
+        return result.get();
+    }
+
     public void merge(Tree tailTree) {
-        this.edges.addAll(tailTree.edges);
-        this.cycleEdges.addAll(tailTree.cycleEdges);
-        this.forwardEdges.addAll(tailTree.forwardEdges);
+
+        Tree headTree = this;
+
+        DepthFirstTraversal traversal = new DepthFirstTraversal(tailTree) {
+            @Override
+            public boolean onVisitEdge(Edge edge, int depth) {
+                headTree.addEdge(edge);
+                return true;
+            }
+        };
+
+        traversal.traverse();
     }
 
     public Set<Edge> getCycleEdges() {
@@ -260,4 +293,15 @@ public class Tree {
     public Set<Edge> getForwardEdges() {
         return forwardEdges;
     }
+
+    @Override
+    public String toString() {
+        return "Tree{" +
+                "rootNode=" + rootNode +
+                ", edges=" + edges +
+                ", cycleEdges=" + cycleEdges +
+                ", forwardEdges=" + forwardEdges +
+                '}';
+    }
+
 }

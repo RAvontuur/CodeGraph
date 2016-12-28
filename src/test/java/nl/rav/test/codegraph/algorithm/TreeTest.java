@@ -235,6 +235,19 @@ public class TreeTest {
     }
 
     @Test
+    public void testSimpleCycle() {
+        Edge edge1 = new Edge(1, 2);
+        Edge edge2 = new Edge(2, 1);
+
+        Tree tree = new Tree(edge1);
+        tree.addEdge(edge2);
+
+        assertThat(tree.getRootNode(), is(1L));
+        assertTrue(tree.containsEdge(edge1));
+        assertTrue(tree.hasCycleEdge(edge2));
+    }
+
+    @Test
     public void testCycle() {
 
         Edge edge1 = new Edge(1, 2);

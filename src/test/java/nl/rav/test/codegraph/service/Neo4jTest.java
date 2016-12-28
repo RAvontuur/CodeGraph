@@ -54,11 +54,41 @@ public class Neo4jTest {
     }
 
     @Test
-    public void findDependencies() {
-        List<PackageEntity> packagesDependingOn = packageRepository.findPackagesDependingOn("nl.rav.codegraph.controller");
+    public void testFindSisters() {
+        List<PackageEntity> packagesDependingOn = packageRepository.findSistersDependingOnBrother("nl.rav.codegraph.controller");
         System.out.println(" results: " + packagesDependingOn.size());
         for(PackageEntity dependantPackage: packagesDependingOn) {
             System.out.println(dependantPackage);
         }
     }
+
+
+    @Test
+    public void testFindChildrenDependingOnParent() {
+        List<PackageEntity> packagesDependingOn = packageRepository.findChildrenDependingOnParent("nl.rav.codegraph.controller.drawing");
+        System.out.println(" results: " + packagesDependingOn.size());
+        for(PackageEntity dependantPackage: packagesDependingOn) {
+            System.out.println(dependantPackage);
+        }
+    }
+
+    @Test
+    public void testFindChildrenDependingOnParent2() {
+        List<PackageEntity> packagesDependingOn = packageRepository.findChildrenDependingOnParent("nl.rav.codegraph");
+        System.out.println(" results: " + packagesDependingOn.size());
+        for(PackageEntity dependantPackage: packagesDependingOn) {
+            System.out.println(dependantPackage);
+        }
+    }
+
+
+    @Test
+    public void testFindParentDependingOnChild() {
+        List<PackageEntity> packagesDependingOn = packageRepository.findParentDependingOnChild("nl.rav.codegraph.controller.drawing.domain");
+        System.out.println(" results: " + packagesDependingOn.size());
+        for(PackageEntity dependantPackage: packagesDependingOn) {
+            System.out.println(dependantPackage);
+        }
+    }
+
 }

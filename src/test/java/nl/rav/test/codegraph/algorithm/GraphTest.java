@@ -59,7 +59,7 @@ public class GraphTest {
     }
 
     @Test
-    public void TestThreeTrees() {
+    public void testThreeTrees() {
 
         Graph graph = new Graph();
 
@@ -87,7 +87,7 @@ public class GraphTest {
     }
 
     @Test
-    public void TestLibraryTree() {
+    public void testLibraryTree() {
 
         Graph graph = new Graph();
 
@@ -116,7 +116,7 @@ public class GraphTest {
     }
 
     @Test
-    public void TestLibraryTree3() {
+    public void testLibraryTree3() {
 
         Graph graph = new Graph();
 
@@ -150,7 +150,7 @@ public class GraphTest {
     }
 
     @Test
-    public void TestMultipleLibraryTree3() {
+    public void testMultipleLibraryTree3() {
 
         Graph graph = new Graph();
 
@@ -196,7 +196,7 @@ public class GraphTest {
     }
 
     @Test
-    public void TestNestedLibrary() {
+    public void testNestedLibrary() {
 
         Graph graph = new Graph();
 
@@ -237,7 +237,7 @@ public class GraphTest {
     }
 
     @Test
-    public void TestNestedLibrary2() {
+    public void testNestedLibrary2() {
 
         Graph graph = new Graph();
 
@@ -279,7 +279,7 @@ public class GraphTest {
     }
 
     @Test
-    public void TestCycleToLibrary() {
+    public void testCycleToLibrary() {
 
         Graph graph = new Graph();
 
@@ -314,7 +314,7 @@ public class GraphTest {
     }
 
     @Test
-    public void TestCycleToLibrary2() {
+    public void testCycleToLibrary2() {
 
         Graph graph = new Graph();
 
@@ -351,7 +351,7 @@ public class GraphTest {
 
 
     @Test
-    public void TestForwardToLibrary2() {
+    public void testForwardToLibrary2() {
 
         Graph graph = new Graph();
 
@@ -387,7 +387,7 @@ public class GraphTest {
     }
 
     @Test
-    public void TestForwardToNewLibrary() {
+    public void testForwardToNewLibrary() {
 
         Graph graph = new Graph();
 
@@ -424,5 +424,33 @@ public class GraphTest {
         assertThat(tree4.getRootNode(), is(4L));
     }
 
+    @Test
+    public void testIssue1() {
+
+        Edge edge1 = new Edge(13, 133);
+        Edge edge2 = new Edge(13, 336);
+        Edge edge3 = new Edge(13, 14);
+        Edge edge4 = new Edge(336, 13);
+        Edge edge5 = new Edge(14, 13);
+        Edge edge6 = new Edge(133, 13);
+        Edge edge7 = new Edge(176, 133);
+        Edge edge8 = new Edge(176, 336);
+        Edge edge9 = new Edge(176, 14);
+        Edge edge10 = new Edge(14, 133);
+
+        Graph graph = new Graph();
+
+        graph.addEdge(edge1);
+        graph.addEdge(edge2);
+        graph.addEdge(edge3);
+        graph.addEdge(edge4);
+        graph.addEdge(edge5);
+        graph.addEdge(edge6);
+        graph.addEdge(edge7);
+        graph.addEdge(edge8);
+        graph.addEdge(edge9);
+        graph.addEdge(edge10);
+
+    }
 
 }

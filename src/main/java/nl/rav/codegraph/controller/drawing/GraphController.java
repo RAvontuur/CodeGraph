@@ -15,9 +15,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Rest-service returning objects to be drawn by d3.js
@@ -37,20 +35,36 @@ public class GraphController {
         String url = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String fqn = RequestParser.parseToPackage(url, "data");
 
-        PackageMap packageMap = new PackageMap();
+        JavaPackage selectedPackage = packageService.findPackage(fqn);
+        JavaPackage thisPackage = new JavaPackage(selectedPackage.getId(), ".", selectedPackage.getFqn());
 
         List<JavaPackage> childPackages = packageService.findChildren(fqn);
+
+        PackageMap packageMap = new PackageMap();
+        packageMap.addJavaPackage(thisPackage);
         childPackages.stream().forEach(javaPackage -> packageMap.addJavaPackage(javaPackage));
 
         List<Edge> edges = new ArrayList<>();
-        Set<Long> nodes = new HashSet<>();
+
+        List<JavaPackage> childDependents = packageService.findChildrenDependingOnParent(thisPackage.getFqn());
+        for (JavaPackage childDependent : childDependents) {
+            if (packageMap.getJavaPackage(childDependent.getId()) != null) {
+                edges.add(new Edge(thisPackage.getId(), childDependent.getId()));
+            }
+        }
+
+        for (JavaPackage child : childPackages) {
+            JavaPackage parent = packageService.findParentPackageDependingOnChild(child.getFqn());
+            if (parent != null) {
+                edges.add(new Edge(child.getId(), parent.getId()));
+            }
+        }
 
         for (JavaPackage brother : childPackages) {
-            List<JavaPackage> sisters = packageService.findPackagesDependingOn(brother.getFqn());
+            List<JavaPackage> sisters = packageService.findSisterPackagesDependingOnBrother(brother.getFqn());
             for (JavaPackage sister : sisters) {
                 edges.add(new Edge(brother.getId(), sister.getId()));
             }
-            nodes.add(brother.getId());
         }
 
         Graph graph = new Graph();
