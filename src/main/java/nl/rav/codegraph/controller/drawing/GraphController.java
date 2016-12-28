@@ -4,8 +4,10 @@ import nl.rav.codegraph.algorithm.spanningtree.Edge;
 import nl.rav.codegraph.algorithm.spanningtree.Graph;
 import nl.rav.codegraph.controller.drawing.domain.Drawing;
 import nl.rav.codegraph.controller.drawing.domain.GraphConverter;
+import nl.rav.codegraph.domain.Artifact;
 import nl.rav.codegraph.domain.JavaPackage;
 import nl.rav.codegraph.domain.PackageMap;
+import nl.rav.codegraph.neo4j.service.ArtifactService;
 import nl.rav.codegraph.neo4j.service.PackageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,16 +26,20 @@ import java.util.List;
 public class GraphController {
 
     private final PackageService packageService;
+    private final ArtifactService artifactService;
 
     @Autowired
-    public GraphController(PackageService packageService) {
+    public GraphController(PackageService packageService, ArtifactService artifactService) {
         this.packageService = packageService;
+        this.artifactService = artifactService;
     }
 
     @RequestMapping("**/data")
     List<Object> dataroot(HttpServletRequest request) throws IOException {
         String url = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String fqn = RequestParser.parseToPackage(url, "data");
+
+        Artifact artifact = artifactService.findArtifact(fqn, "jar");
 
         JavaPackage selectedPackage = packageService.findPackage(fqn);
         JavaPackage thisPackage = new JavaPackage(selectedPackage.getId(), ".", selectedPackage.getFqn());
@@ -74,6 +80,7 @@ public class GraphController {
         Drawing drawing = converter.createDrawing(graph, packageMap);
 
         List<Object> result = new ArrayList<>();
+        //result.add(artifact);
         result.addAll(drawing.getRectangles().values());
         result.addAll(drawing.getArrows());
         return result;

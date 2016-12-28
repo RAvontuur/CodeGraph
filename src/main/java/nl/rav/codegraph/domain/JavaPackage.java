@@ -5,6 +5,7 @@ package nl.rav.codegraph.domain;
  */
 public class JavaPackage {
 
+    private String clsid = "package";
     private final long id;
     private final String name;
     private final String fqn;
@@ -13,6 +14,10 @@ public class JavaPackage {
         this.id = id;
         this.name = name;
         this.fqn = fqn;
+    }
+
+    public String getClsid() {
+        return clsid;
     }
 
     public long getId() {

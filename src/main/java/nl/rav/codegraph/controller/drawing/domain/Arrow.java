@@ -4,6 +4,7 @@ package nl.rav.codegraph.controller.drawing.domain;
  * Created by rene on 10-3-16.
  */
 public class Arrow {
+    private String clsid = "arrow";
     private final int x1;
     private final int y1;
     private final int x2;
@@ -17,6 +18,10 @@ public class Arrow {
         this.x2 = x2;
         this.y2 = y2;
         this.arrowType = arrowType;
+    }
+
+    public String getClsid() {
+        return clsid;
     }
 
     public int getX1() {

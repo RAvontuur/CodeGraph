@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 @ContextHierarchy({
         @ContextConfiguration(classes = {PersistenceContext.class}),
 })
-public class Neo4jTest {
+public class PackageRepositoryNeo4jTest {
 
 
     @Autowired

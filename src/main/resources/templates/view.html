@@ -72,13 +72,23 @@
             var yOffset = 5;
             var yNameOffset = 10;
 
+            var rectangles = objects.filter(function(d) { return d.clsid == "rectangle" });
+            var arrows = objects.filter(function(d) { return d.clsid == "arrow" });
+
 			var xScale = d3.scaleLinear().domain([0,500]).range([ 0, 1000 ]);
 			var yScale = d3.scaleLinear().domain([0,400]).range([ 0, 800 ]);
+//
+//            d3.select("svg").selectAll("text").data(objects)
+//                    .enter()
+//                    .append("text")
+//                    .filter(function(d) { return d.clsid == "artifact" })
+//                    .attr("x", function(d) {return xScale(0);})
+//                    .attr("y", function(d) {return yScale(yOffset);})
+//                    .text( function(d) {return d.fqn;});
 
-			d3.select("svg").selectAll("rect").data(objects)
+			d3.select("svg").selectAll("rect").data(rectangles)
 					.enter()
 					.append("rect")
-                    .filter(function(d) { return d.name })
                     .attr("class", "package")
                     .attr("width", xScale(50))
 					.attr("height",yScale(recHeight))
@@ -100,18 +110,16 @@
 					.append("svg:path")
 					.attr("d", "M0,-2L4,0L0,0");
 
-            d3.select("svg").selectAll("text").data(objects)
+            d3.select("svg").selectAll("text").data(rectangles)
                     .enter()
                     .append("text")
-                    .filter(function(d) { return d.name })
                     .attr("x", function(d) {return xScale(30 + d.x * 60);})
                     .attr("y", function(d) {return yScale(yOffset + yNameOffset + d.y * cellHeight);})
                     .text( function(d) {return d.name;});
 
-			d3.select("svg").selectAll("line").data(objects)
+			d3.select("svg").selectAll("line").data(arrows)
 					.enter()
 					.append("line")
-                    .filter(function(d) { return d.x1 })
 					.attr("x1", function(d) {
                         if (d.arrowType == "tree") {
                             // start from the middle

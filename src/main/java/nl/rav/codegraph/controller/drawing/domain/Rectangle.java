@@ -4,9 +4,15 @@ package nl.rav.codegraph.controller.drawing.domain;
  * Created by rene on 20-11-16.
  */
 public class Rectangle {
+
+    private String clsid = "rectangle";
     private String name;
     private int x;
     private int y;
+
+    public String getClsid() {
+        return clsid;
+    }
 
     public void setName(String name) {
         this.name = name;
